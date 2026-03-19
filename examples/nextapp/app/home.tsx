@@ -1,25 +1,44 @@
 'use client';
 
-import { Controller } from '@/aziface';
 import { useBiometricConfigs } from '@/services';
 import { useUser } from './hooks';
+import { useState } from 'react';
+import { useController } from '@/hooks/useController';
 
 export default function HomePage() {
-  const controller = new Controller();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const { current: controller } = useController();
   const { data: configs } = useBiometricConfigs();
   const { tokenBiometric, logout } = useUser();
-  const handleInitialize = () => {
-    try {
-      const initialized = controller.initialize({
-        params: { baseUrl: process.env.NEXT_PUBLIC_API_URL_AZTECH || '', deviceKeyIdentifier: configs?.device || '' },
-        headers: { 'x-token-bearer': tokenBiometric, 'x-only-raw-analysis': '1' },
-      });
-      console.log('isInitialized', initialized);
-    } catch (error) {
-      console.error('Initialize', error);
-    }
+
+  const onInitialize = (): void => {
+    const params = {
+      baseUrl: process.env.NEXT_PUBLIC_API_URL_AZTECH || '',
+      deviceKeyIdentifier: configs?.device || '',
+      isDevelopment: true,
+    };
+
+    const headers = {
+      'x-token-bearer': tokenBiometric || '',
+      'x-only-raw-analysis': '1',
+    };
+
+    controller.initialize({ params, headers }, initialized => {
+      setIsInitialized(initialized);
+      console.log(
+        'Initialization callback received with success:',
+        initialized,
+      );
+    });
   };
-  const handleEnroll = async () => controller.enroll();
+
+  const onDeinitialize = (): void => {
+    controller.dispose(disposed => {
+      setIsInitialized(!disposed);
+      console.log('Dispose callback received with success:', disposed);
+    });
+  };
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
@@ -29,24 +48,58 @@ export default function HomePage() {
 
         <div className='flex flex-col gap-3'>
           <button
-            onClick={handleInitialize}
+            onClick={onInitialize}
             className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Initialize
           </button>
 
           <button
-            onClick={handleEnroll}
-            className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+            onClick={controller.enroll}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Enroll
           </button>
 
           <button
-            onClick={() => console.log('Liveness')}
-            className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+            onClick={controller.liveness}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Liveness
+          </button>
+
+          <button
+            onClick={controller.authenticate}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Authenticate
+          </button>
+
+          <button
+            onClick={controller.photoMatch}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Photo Match
+          </button>
+
+          <button
+            onClick={controller.photoScan}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Photo Scan
+          </button>
+
+          <button
+            onClick={onDeinitialize}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Deinitialize
           </button>
 
           <button

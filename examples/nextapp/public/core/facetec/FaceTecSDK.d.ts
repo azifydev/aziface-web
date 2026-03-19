@@ -16,18 +16,19 @@ import {
 } from './FaceTecCustomization';
 import { FaceTecLoggingMode } from './FaceTecLogging';
 import {
-  FaceTecProcessor,
+  FaceTecSessionRequestProcessor,
   FaceTecInitializeCallback,
   FaceTecSessionStatus,
   FaceTecInitializationError,
 } from './FaceTecPublicApi';
-export declare var FaceTecSDK: {
+
+export declare let FaceTecSDK: {
   /**
-   * Initialize SDK using a FaceTecProcessor.
+   * Initialize SDK using a FaceTecSessionRequestProcessor.
    */
   initializeWithSessionRequest: (
     deviceKeyIdentifier: string,
-    Processor: FaceTecProcessor,
+    sessionRequestProcessor: FaceTecSessionRequestProcessor,
     callback: FaceTecInitializeCallback,
   ) => void;
   /**
@@ -85,17 +86,23 @@ export declare var FaceTecSDK: {
   /**
    * Apply the specified customization parameters for FaceTec SDK.
    **/
-  setCustomization: (customizationOrSecurityChangeOperation: FaceTecCustomization) => void;
+  setCustomization: (
+    customizationOrSecurityChangeOperation: FaceTecCustomization,
+  ) => void;
   /**
    * Apply the specified customization parameters for FaceTec SDK to use when low light mode is active.
    * If not configured or set to nil, we will fallback to using the FaceTecCustomization instance configured with setCustomization(), or our default customizations if setCustomization() has not been called.
    **/
-  setLowLightCustomization: (lowLightCustomization: FaceTecCustomization | null) => void;
+  setLowLightCustomization: (
+    lowLightCustomization: FaceTecCustomization | null,
+  ) => void;
   /**
    * Apply the specified customization parameters for FaceTec SDK to use when dynamic dimming is active.
    * If not configured or set to nil, we will fallback to using the FaceTecCustomization instance configured with setCustomization(), or our default customizations if setCustomization() has not been called.
    **/
-  setDynamicDimmingCustomization: (dynamicDimmingCustomization: FaceTecCustomization | null) => void;
+  setDynamicDimmingCustomization: (
+    dynamicDimmingCustomization: FaceTecCustomization | null,
+  ) => void;
   /**
    * Return the available FaceTecSDK exit animation styles.
    **/
@@ -131,7 +138,9 @@ export declare var FaceTecSDK: {
    * IMPORTANT: The FaceTec SDK must be successfully initialized before calling this API.
    * @param ocrLocalizationJSON Optional object created from a JSON that follows our template file of configurable groups, fields, and placeholder texts: "FaceTec_OCR_Customization.json".  By default, this is null and the strings used will be our internal defaults.
    */
-  configureOCRLocalization: (ocrLocalizationJSON: { [key: string]: any }) => void;
+  configureOCRLocalization: (ocrLocalizationJSON: {
+    [key: string]: any;
+  }) => void;
   /**
    * Unload FaceTecSDK and all its resources.
    **/
