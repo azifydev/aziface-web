@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Aziface + Next.js',
-  description: 'Aziface SDK integration example using Next.js',
+  title: 'Aziface Web + Next.js',
+  description: 'Aziface Web SDK integration example using Next.js',
 };
 
 export default function RootLayout({
