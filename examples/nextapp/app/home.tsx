@@ -11,6 +11,7 @@ import {
   liveness,
   photoMatch,
   photoScan,
+  withTheme,
 } from '@/lib/aziface/aziface';
 import { FaceType } from '@/types/services.types';
 import toast, { Toaster } from 'react-hot-toast';
@@ -40,6 +41,11 @@ export default function HomePage() {
       setIsInitialized(initialized.isSuccess);
       if (error) {
         toast.error(`${error.cause} - (${error.code})`);
+      } else {
+        withTheme({
+          brandingImage: 'custom_branding.png',
+          cancelImage: 'custom_cancel.png',
+        });
       }
     });
   };

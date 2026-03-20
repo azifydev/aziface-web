@@ -12,17 +12,19 @@ import {
   DisposeCallback,
   InitializeHeaders,
   MethodError,
+  Style,
 } from '../../types/aziface.types';
 import { SessionError } from './errors';
 import { SessionRequestProcessor } from './request-processor';
+import { applyTheme } from './theme';
 import { getInitializationErrorCauseByCode } from './utils';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
 export class AzifaceController implements Controller {
-  private static latestExternalDatabaseRefID: string = '';
   public static isInitialized: boolean = false;
   public static isDevelopment: boolean = false;
+  private static latestExternalDatabaseRefID: string = '';
   public static deviceKeyIdentifier: string = '';
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
@@ -36,6 +38,8 @@ export class AzifaceController implements Controller {
 
     FaceTecSDK.setImagesDirectory('/core/images');
     FaceTecSDK.setResourceDirectory('/core/facetec/resources');
+
+    applyTheme();
 
     if (AzifaceController.isInitialized) {
       callback({
@@ -176,6 +180,8 @@ export class AzifaceController implements Controller {
     this.faceTecSDKInstance.startIDScanOnly(sessionRequestProcessor);
   };
 
+  public withTheme = (overrides?: Style): void => applyTheme(overrides);
+
   private setupController = (init: Initialize): void => {
     AzifaceController.deviceKeyIdentifier =
       init?.params?.deviceKeyIdentifier || '';
@@ -191,6 +197,8 @@ export class AzifaceController implements Controller {
     AzifaceController.deviceKeyIdentifier = '';
     AzifaceController.baseUrl = '';
     AzifaceController.headers = {} as InitializeHeaders;
+
+    this.withTheme();
   };
 
   private generateExternalDatabaseRefID = (): string =>
@@ -203,9 +211,7 @@ export class AzifaceController implements Controller {
     AzifaceController.isInitialized = true;
   };
 
-  private onInitializationError = (): void => {
-    AzifaceController.isInitialized = false;
-  };
+  private onInitializationError = (): void => this.cleanup();
 
   private onComplete = (faceTecSessionStatus: FaceTecSessionStatus): void => {
     const isError =
@@ -247,4 +253,12 @@ export function photoMatch(): void {
 
 export function photoScan(): void {
   controller.photoScan();
+}
+
+export function withTheme(overrides?: Style): void {
+  controller.withTheme(overrides);
+}
+
+export function resetTheme(): void {
+  controller.withTheme();
 }
