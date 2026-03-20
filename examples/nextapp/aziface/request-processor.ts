@@ -2,11 +2,10 @@ import {
   FaceTecSessionRequestProcessorCallback,
   FaceTecSessionResult,
   FaceTecSessionStatus,
-} from '../../public/core/facetec/FaceTecPublicApi';
+} from '@/public/core/facetec/FaceTecPublicApi';
 import { FaceTecTestingAPINetworkingRequest } from './networking-request';
 
 export class SessionRequestProcessor {
-  // Save the FaceTec SDK request callback so it can be accessed in the helper methods
   public requestCallback!: FaceTecSessionRequestProcessorCallback;
   // Save the onCompleteCallback
   public onCompleteCallback: (

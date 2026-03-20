@@ -1,9 +1,8 @@
-// FaceTec SDK is loaded through a script method
-import { FaceTecSDK as FaceTecSDKType } from '../../public/core/facetec/FaceTecSDK';
+import { FaceTecSDK as FaceTecSDKType } from '@/public/core/facetec/FaceTecSDK';
+import type { FaceTecSessionRequestProcessorCallback } from '@/public/core/facetec/FaceTecPublicApi';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
-import type { FaceTecSessionRequestProcessorCallback } from '../../public/core/facetec/FaceTecPublicApi';
 import { AzifaceController } from './aziface';
 
 // Sample class for handling networking calls needed in order for FaceTec to function correctly.
@@ -62,7 +61,9 @@ export class FaceTecTestingAPINetworkingRequest {
     }
 
     Object.entries(AzifaceController.headers).forEach(([key, value]) => {
-      this.request.setRequestHeader(key, value || '');
+      if (value) {
+        this.request.setRequestHeader(key, value);
+      }
     });
 
     //
@@ -82,12 +83,9 @@ export class FaceTecTestingAPINetworkingRequest {
         case 200:
           try {
             this.processResponse(requestCallback.processResponse);
-          } catch (e: unknown) {
+          } catch {
             // You may want to implement some sort of retry logic here
             // This should never be called except when a hard server error occurs. For example the user loses network connectivity.
-            console.log(
-              `FaceTecTestingAPINetworkingRequest >> request.onload >> Failed to parse responseText: ${e}`,
-            );
             requestCallback.abortOnCatastrophicError();
           }
 
@@ -98,9 +96,6 @@ export class FaceTecTestingAPINetworkingRequest {
         default:
           // You may want to implement some sort of retry logic here
           // This should never be called except when a hard server error occurs. For example the user loses network connectivity.
-          console.log(
-            `FaceTecTestingAPINetworkingRequest >> request.onload >> Server Status: ${this.request.status}`,
-          );
 
           requestCallback.abortOnCatastrophicError();
       }
@@ -109,11 +104,7 @@ export class FaceTecTestingAPINetworkingRequest {
     // On catastrophic error call the onCatastrophicNetworkError handler
     // This should never be called except when a hard server error occurs. For example the user loses network connectivity.
     // You may want to implement some sort of retry logic here
-    this.request.onerror = (ev: ProgressEvent): void => {
-      console.log(
-        `FaceTecTestingAPINetworkingRequest >> request.onerror >> Catastrophic error: ${ev}`,
-      );
-
+    this.request.onerror = (): void => {
       requestCallback.abortOnCatastrophicError();
     };
 

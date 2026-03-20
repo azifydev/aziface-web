@@ -3,21 +3,21 @@ import {
   FaceTecSDKInstance,
   FaceTecSessionRequestProcessor,
   FaceTecSessionStatus,
-} from '../../public/core/facetec/FaceTecPublicApi';
-import { FaceTecSDK as FaceTecSDKType } from '../../public/core/facetec/FaceTecSDK';
-import {
-  Controller,
-  Initialize,
-  InitializeCallback,
-  DisposeCallback,
-  InitializeHeaders,
-  MethodError,
-  Style,
-} from '../../types/aziface.types';
+} from '@/public/core/facetec/FaceTecPublicApi';
+import { FaceTecSDK as FaceTecSDKType } from '@/public/core/facetec/FaceTecSDK';
 import { SessionError } from './errors';
 import { SessionRequestProcessor } from './request-processor';
 import { applyTheme } from './theme';
 import { getInitializationErrorCauseByCode } from './utils';
+import {
+  Controller,
+  DisposeCallback,
+  Initialize,
+  InitializeCallback,
+  InitializeHeaders,
+  MethodError,
+  Style,
+} from './types';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 

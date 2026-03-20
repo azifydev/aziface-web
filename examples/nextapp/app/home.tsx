@@ -12,10 +12,12 @@ import {
   photoMatch,
   photoScan,
   withTheme,
-} from '@/lib/aziface/aziface';
+  SessionError,
+  InitializeParams,
+  InitializeHeaders,
+} from '@/aziface';
 import { FaceType } from '@/types/services.types';
 import toast, { Toaster } from 'react-hot-toast';
-import { SessionError } from '@/lib/aziface/errors';
 
 export default function HomePage() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -24,13 +26,13 @@ export default function HomePage() {
   const { tokenBiometric, logout } = useUser();
 
   const onInitialize = (): void => {
-    const params = {
+    const params: InitializeParams = {
       baseUrl: process.env.NEXT_PUBLIC_API_URL_AZTECH || '',
       deviceKeyIdentifier: configs?.device || '',
       isDevelopment: true,
     };
 
-    const headers = {
+    const headers: InitializeHeaders = {
       'x-token-bearer': tokenBiometric || '',
       'x-only-raw-analysis': '1',
     };
@@ -149,7 +151,7 @@ export default function HomePage() {
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
-            Deinitialize
+            Dispose
           </button>
 
           <button

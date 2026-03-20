@@ -1,5 +1,5 @@
-import { Style } from '@/types/aziface.types';
-import { FaceTecSDK as FaceTecSDKType } from '../../public/core/facetec/FaceTecSDK';
+import { FaceTecSDK as FaceTecSDKType } from '@/public/core/facetec/FaceTecSDK';
+import { Style } from './types';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
