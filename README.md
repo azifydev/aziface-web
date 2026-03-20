@@ -187,7 +187,7 @@ export function MyPage() {
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
-            Deinitialize
+            Dispose
           </button>
         </div>
       </div>
