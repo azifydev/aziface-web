@@ -4,7 +4,7 @@ import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useBiometricSession, useLogin } from '@/services';
 
-export default function LoginPage() {
+export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { mutateAsync: login, isPending: isPendingLogin } = useLogin();

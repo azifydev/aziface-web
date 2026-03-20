@@ -2,9 +2,9 @@
 
 import Script from 'next/script';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import LoginPage from './login';
-import HomePage from './home';
 import { useUser } from '@/hooks';
+import { Login } from './login';
+import { Home } from './home';
 
 const queryClient = new QueryClient();
 
@@ -17,7 +17,7 @@ export default function Page() {
       <Script src='/core/facetec/FaceTecSDK.js' strategy='beforeInteractive' />
 
       <div className='wrapping-box-container'>
-        {isAuth ? <HomePage /> : <LoginPage />}
+        {isAuth ? <Home /> : <Login />}
       </div>
     </QueryClientProvider>
   );

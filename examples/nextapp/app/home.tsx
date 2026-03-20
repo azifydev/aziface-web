@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { useBiometricConfigs } from '@/services';
 import { useUser } from '@/hooks';
-import { useState } from 'react';
 import {
   authenticate,
   dispose,
@@ -11,15 +12,13 @@ import {
   liveness,
   photoMatch,
   photoScan,
-  withTheme,
   SessionError,
   InitializeParams,
   InitializeHeaders,
 } from '@/aziface';
 import { FaceType } from '@/types/services.types';
-import toast, { Toaster } from 'react-hot-toast';
 
-export default function HomePage() {
+export function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const { data: configs } = useBiometricConfigs();
@@ -43,11 +42,6 @@ export default function HomePage() {
       setIsInitialized(initialized.isSuccess);
       if (error) {
         toast.error(`${error.cause} - (${error.code})`);
-      } else {
-        withTheme({
-          brandingImage: 'custom_branding.png',
-          cancelImage: 'custom_cancel.png',
-        });
       }
     });
   };
