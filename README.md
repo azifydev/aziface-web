@@ -18,6 +18,8 @@ Web SDK adapter for React.
   - [`photoMatch`](#photomatch)
   - [`withTheme`](#withtheme)
     - [`Properties`](#properties-2)
+    - [`Custom images`](#custom-images)
+      - [`Example`](#example)
   - [`resetTheme`](#resettheme)
 - [Types](#types)
   - [`Initialize`](#initialize-1)
@@ -350,6 +352,34 @@ initialize(
 | Property    | Type              | Required | Default     |
 | ----------- | ----------------- | -------- | ----------- |
 | `overrides` | [`Style`](#style) | ❌       | `undefined` |
+
+#### Custom images
+
+The `brandingImage` and `cancelImage` properties represents your branding and icon of the button cancel. Default are [Azify](https://azify.com/) images, and `.png` format. If the image is not found, it will not be displayed during the session.
+
+You must go to your project's `public/core/images` directory. Inside the `public/core/images` folder, you must put your images.
+
+##### Example
+
+Import the `withTheme` method and add image name (with extension), in image property (`brandingImage` or `cancelImage`). Check the code example below:
+
+```ts
+initialize(
+  {
+    // ...
+  },
+  initialized => {
+    if (initialized.error && !initialized.isSuccess) {
+      // ...
+    } else {
+      withTheme({
+        brandingImage: 'branding.png',
+        cancelImage: 'cancel.png',
+      });
+    }
+  },
+);
+```
 
 ### `resetTheme`
 
