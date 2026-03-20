@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from './login';
 import HomePage from './home';
-import { useUser } from './hooks';
+import { useUser } from '@/hooks';
 
 const queryClient = new QueryClient();
 

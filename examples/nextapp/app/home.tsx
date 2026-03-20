@@ -1,14 +1,24 @@
 'use client';
 
 import { useBiometricConfigs } from '@/services';
-import { useUser } from './hooks';
+import { useUser } from '@/hooks';
 import { useState } from 'react';
-import { useController } from '@/hooks/useController';
+import {
+  authenticate,
+  dispose,
+  enroll,
+  initialize,
+  liveness,
+  photoMatch,
+  photoScan,
+} from '@/lib/aziface/aziface';
+import { FaceType } from '@/types/services.types';
+import toast, { Toaster } from 'react-hot-toast';
+import { SessionError } from '@/lib/aziface/errors';
 
 export default function HomePage() {
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const { current: controller } = useController();
   const { data: configs } = useBiometricConfigs();
   const { tokenBiometric, logout } = useUser();
 
@@ -24,24 +34,58 @@ export default function HomePage() {
       'x-only-raw-analysis': '1',
     };
 
-    controller.initialize({ params, headers }, initialized => {
-      setIsInitialized(initialized);
-      console.log(
-        'Initialization callback received with success:',
-        initialized,
-      );
+    initialize({ params, headers }, initialized => {
+      const error = initialized.error;
+
+      setIsInitialized(initialized.isSuccess);
+      if (error) {
+        toast.error(`${error.cause} - (${error.code})`);
+      }
     });
   };
 
-  const onDeinitialize = (): void => {
-    controller.dispose(disposed => {
+  const onDispose = (): void => {
+    dispose(disposed => {
       setIsInitialized(!disposed);
-      console.log('Dispose callback received with success:', disposed);
+
+      if (!disposed) {
+        toast.error('Failed to dispose SDK.');
+      }
     });
+  };
+
+  const onFaceScan = (type: FaceType): void => {
+    try {
+      switch (type) {
+        case 'enroll':
+          enroll();
+          break;
+        case 'authenticate':
+          authenticate();
+          break;
+        case 'liveness':
+          liveness();
+          break;
+        case 'photoMatch':
+          photoMatch();
+          break;
+        case 'photoScan':
+          photoScan();
+          break;
+        default:
+          toast.error(`Invalid face scan type: ${type}`);
+          break;
+      }
+    } catch (error) {
+      const sessionError = error as SessionError;
+      toast.error(sessionError.message);
+    }
   };
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+      <Toaster position='bottom-right' />
+
       <div className='bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm shadow-sm'>
         <h1 className='text-2xl font-semibold text-gray-900 mb-1'>Home</h1>
         <p className='text-sm text-gray-500 mb-6'>Selecione uma ação</p>
@@ -55,7 +99,7 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={controller.enroll}
+            onClick={() => onFaceScan('enroll')}
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
@@ -63,7 +107,7 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={controller.liveness}
+            onClick={() => onFaceScan('liveness')}
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
@@ -71,7 +115,7 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={controller.authenticate}
+            onClick={() => onFaceScan('authenticate')}
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
@@ -79,7 +123,7 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={controller.photoMatch}
+            onClick={() => onFaceScan('photoMatch')}
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
@@ -87,7 +131,7 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={controller.photoScan}
+            onClick={() => onFaceScan('photoScan')}
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
@@ -95,7 +139,7 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={onDeinitialize}
+            onClick={onDispose}
             disabled={!isInitialized}
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >

@@ -6,16 +6,19 @@ export interface ConfigsResponseData {
     message: string;
   };
 }
+
 export interface CreateUserRequest {
   name: string;
   assembleUserId: string;
   username: string;
   password: string;
 }
+
 export interface LoginRequest {
   username: string;
   password: string;
 }
+
 export interface LoginResponse {
   accessToken: string;
   tokenType: string;
@@ -25,3 +28,10 @@ export interface LoginResponse {
     name: string;
   };
 }
+
+export type FaceType =
+  | 'enroll'
+  | 'authenticate'
+  | 'liveness'
+  | 'photoScan'
+  | 'photoMatch';

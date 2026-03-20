@@ -1,4 +1,4 @@
-import { useUserStore } from '@/app/hooks';
+import { useUserStore } from '@/hooks';
 import axios from 'axios';
 
 export const clientBaseURL = process.env.NEXT_PUBLIC_API_CLIENT_API;
@@ -11,12 +11,12 @@ export const clientApi = axios.create({
   },
 });
 clientApi.interceptors.request.use(
-  async (config) => {
+  async config => {
     const token = useUserStore.getState()?.token || '';
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    config.validateStatus = (status) => {
+    config.validateStatus = status => {
       if (status === 401) {
         return false;
       }
@@ -24,14 +24,14 @@ clientApi.interceptors.request.use(
     };
     return config;
   },
-  (error) => {
+  error => {
     Promise.reject(error);
   },
 );
 
 clientApi.interceptors.response.use(
-  (res) => res,
-  (error) => {
+  res => res,
+  error => {
     return Promise.reject(error);
   },
 );

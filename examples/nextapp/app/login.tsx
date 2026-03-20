@@ -1,21 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useBiometricSession, useLogin } from '@/services';
 import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useBiometricSession, useLogin } from '@/services';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { mutateAsync: login, isPending: isPendingLogin } = useLogin();
-  const { mutateAsync: createSession, isPending: isPendingSession } = useBiometricSession();
+  const { mutateAsync: createSession, isPending: isPendingSession } =
+    useBiometricSession();
 
   const handleLogin = async () => {
     try {
       await login({ username, password });
       await createSession();
-    } catch (error: any) {
-      alert(`Login Error: ${error.message}`);
+    } catch {
+      toast.error('Login failed. Please check your credentials and try again.');
     }
   };
   const isPending = isPendingSession || isPendingLogin;
@@ -23,6 +24,8 @@ export default function LoginPage() {
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+      <Toaster position='bottom-right' />
+
       <div className='bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm shadow-sm'>
         <h1 className='text-2xl font-semibold text-gray-900 mb-1'>Entrar</h1>
         <p className='text-sm text-gray-500 mb-6'>Acesse sua conta</p>
@@ -32,7 +35,7 @@ export default function LoginPage() {
           <input
             type='text'
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             placeholder='seu.usuario'
             className='w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-300'
           />
@@ -43,7 +46,7 @@ export default function LoginPage() {
           <input
             type='password'
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             placeholder='••••••••'
             className='w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-300'
           />

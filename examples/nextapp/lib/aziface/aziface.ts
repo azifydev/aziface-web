@@ -8,11 +8,14 @@ import { FaceTecSDK as FaceTecSDKType } from '../../public/core/facetec/FaceTecS
 import {
   Controller,
   Initialize,
-  Headers,
   InitializeCallback,
   DisposeCallback,
+  InitializeHeaders,
+  MethodError,
 } from '../../types/aziface.types';
+import { SessionError } from './errors';
 import { SessionRequestProcessor } from './request-processor';
+import { getInitializationErrorCauseByCode } from './utils';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
@@ -22,7 +25,7 @@ export class AzifaceController implements Controller {
   public static isDevelopment: boolean = false;
   public static deviceKeyIdentifier: string = '';
   public static baseUrl: string = '';
-  public static headers: Headers = {} as Headers;
+  public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
 
   public initialize = (
@@ -35,7 +38,10 @@ export class AzifaceController implements Controller {
     FaceTecSDK.setResourceDirectory('/core/facetec/resources');
 
     if (AzifaceController.isInitialized) {
-      callback(true);
+      callback({
+        isSuccess: true,
+        error: undefined,
+      });
       return;
     }
 
@@ -50,22 +56,21 @@ export class AzifaceController implements Controller {
       sessionRequestProcessor,
       {
         onSuccess: (newFaceTecSdkInstance: FaceTecSDKInstance) => {
-          this.faceTecSDKInstance = newFaceTecSdkInstance;
-          console.log('Initialized Successfully.');
-          AzifaceController.isInitialized = true;
-          callback(true);
+          this.onInitializationSuccess(newFaceTecSdkInstance);
+          callback({
+            isSuccess: true,
+            error: undefined,
+          });
         },
         onError: (initializationError: FaceTecInitializationError) => {
-          if (
-            initializationError ===
-            FaceTecSDK.FaceTecInitializationError.RequestAborted
-          ) {
-            console.log('Initialization request was aborted.');
-          }
-
-          console.log(`Initialization Error: ${initializationError}`);
-          AzifaceController.isInitialized = false;
-          callback(false);
+          this.onInitializationError();
+          callback({
+            isSuccess: false,
+            error: {
+              code: initializationError,
+              cause: getInitializationErrorCauseByCode(initializationError),
+            },
+          });
         },
       },
     );
@@ -74,51 +79,40 @@ export class AzifaceController implements Controller {
   public dispose = (callback: DisposeCallback): void => {
     if (AzifaceController.isInitialized) {
       try {
-        AzifaceController.isInitialized = false;
+        this.cleanup();
         FaceTecSDK.deinitialize(() => callback(true));
-      } catch (error) {
+      } catch {
         AzifaceController.isInitialized = true;
-        console.error('Error during FaceTec SDK dispose:', error);
         callback(false);
       }
     } else {
       AzifaceController.isInitialized = false;
-      console.warn('FaceTec SDK is not initialized. No need to dispose.');
       callback(true);
     }
   };
 
   public authenticate = (): void => {
-    if (!AzifaceController.isInitialized) {
-      console.error(
-        'FaceTec SDK is not initialized. Please initialize before attempting to authenticate.',
-      );
-      return;
+    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
+      throw new SessionError(MethodError.NotInitialized);
     }
 
     if (AzifaceController.latestExternalDatabaseRefID.length === 0) {
-      console.error(
-        'No user enrolled. Please enroll a user before attempting to authenticate.',
-      );
-      return;
+      throw new SessionError(MethodError.NoUserEnrolled);
     } else {
       const sessionRequestProcessor: FaceTecSessionRequestProcessor =
         new SessionRequestProcessor(
           AzifaceController.latestExternalDatabaseRefID,
           this.onComplete,
         );
-      this.faceTecSDKInstance?.start3DLivenessThen3DFaceMatch(
+      this.faceTecSDKInstance.start3DLivenessThen3DFaceMatch(
         sessionRequestProcessor,
       );
     }
   };
 
   public enroll = (): void => {
-    if (!AzifaceController.isInitialized) {
-      console.error(
-        'FaceTec SDK is not initialized. Please initialize before attempting to enroll.',
-      );
-      return;
+    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
+      throw new SessionError(MethodError.NotInitialized);
     }
 
     AzifaceController.latestExternalDatabaseRefID =
@@ -129,15 +123,12 @@ export class AzifaceController implements Controller {
         AzifaceController.latestExternalDatabaseRefID,
         this.onComplete,
       );
-    this.faceTecSDKInstance?.start3DLiveness(sessionRequestProcessor);
+    this.faceTecSDKInstance.start3DLiveness(sessionRequestProcessor);
   };
 
   public liveness = (): void => {
-    if (!AzifaceController.isInitialized) {
-      console.error(
-        'FaceTec SDK is not initialized. Please initialize before attempting to authenticate.',
-      );
-      return;
+    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
+      throw new SessionError(MethodError.NotInitialized);
     }
 
     AzifaceController.latestExternalDatabaseRefID = '';
@@ -147,15 +138,12 @@ export class AzifaceController implements Controller {
         AzifaceController.latestExternalDatabaseRefID,
         this.onComplete,
       );
-    this.faceTecSDKInstance?.start3DLiveness(sessionRequestProcessor);
+    this.faceTecSDKInstance.start3DLiveness(sessionRequestProcessor);
   };
 
   public photoMatch = (): void => {
-    if (!AzifaceController.isInitialized) {
-      console.error(
-        'FaceTec SDK is not initialized. Please initialize before attempting to authenticate.',
-      );
-      return;
+    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
+      throw new SessionError(MethodError.NotInitialized);
     }
 
     AzifaceController.latestExternalDatabaseRefID =
@@ -166,19 +154,15 @@ export class AzifaceController implements Controller {
         AzifaceController.latestExternalDatabaseRefID,
         this.onComplete,
       );
-    if (this.faceTecSDKInstance) {
-      this.faceTecSDKInstance.start3DLivenessThen3D2DPhotoIDMatch(
-        sessionRequestProcessor,
-      );
-    }
+
+    this.faceTecSDKInstance.start3DLivenessThen3D2DPhotoIDMatch(
+      sessionRequestProcessor,
+    );
   };
 
   public photoScan = (): void => {
-    if (!AzifaceController.isInitialized) {
-      console.error(
-        'FaceTec SDK is not initialized. Please initialize before attempting to authenticate.',
-      );
-      return;
+    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
+      throw new SessionError(MethodError.NotInitialized);
     }
 
     AzifaceController.latestExternalDatabaseRefID =
@@ -189,7 +173,7 @@ export class AzifaceController implements Controller {
         AzifaceController.latestExternalDatabaseRefID,
         this.onComplete,
       );
-    this.faceTecSDKInstance?.startIDScanOnly(sessionRequestProcessor);
+    this.faceTecSDKInstance.startIDScanOnly(sessionRequestProcessor);
   };
 
   private setupController = (init: Initialize): void => {
@@ -200,16 +184,67 @@ export class AzifaceController implements Controller {
     AzifaceController.headers = init?.headers;
   };
 
+  private cleanup = (): void => {
+    AzifaceController.isInitialized = false;
+    AzifaceController.isDevelopment = false;
+    AzifaceController.latestExternalDatabaseRefID = '';
+    AzifaceController.deviceKeyIdentifier = '';
+    AzifaceController.baseUrl = '';
+    AzifaceController.headers = {} as InitializeHeaders;
+  };
+
   private generateExternalDatabaseRefID = (): string =>
     'aziface_web_' + crypto.randomUUID();
 
+  private onInitializationSuccess = (
+    newFaceTecSdkInstance: FaceTecSDKInstance,
+  ): void => {
+    this.faceTecSDKInstance = newFaceTecSdkInstance;
+    AzifaceController.isInitialized = true;
+  };
+
+  private onInitializationError = (): void => {
+    AzifaceController.isInitialized = false;
+  };
+
   private onComplete = (faceTecSessionStatus: FaceTecSessionStatus): void => {
-    if (
-      faceTecSessionStatus === FaceTecSDK.FaceTecSessionStatus.SessionCompleted
-    ) {
-      console.log('Session was performed successfully.');
-    } else {
-      console.log('Session status:', faceTecSessionStatus);
+    const isError =
+      faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
+    if (isError) {
+      throw new SessionError(faceTecSessionStatus);
     }
   };
+}
+
+const controller = new AzifaceController();
+
+export function initialize(
+  init: Initialize,
+  callback: InitializeCallback,
+): void {
+  controller.initialize(init, callback);
+}
+
+export function dispose(callback: DisposeCallback): void {
+  controller.dispose(callback);
+}
+
+export function enroll(): void {
+  controller.enroll();
+}
+
+export function authenticate(): void {
+  controller.authenticate();
+}
+
+export function liveness(): void {
+  controller.liveness();
+}
+
+export function photoMatch(): void {
+  controller.photoMatch();
+}
+
+export function photoScan(): void {
+  controller.photoScan();
 }
