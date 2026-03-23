@@ -16,9 +16,7 @@ export default function Page() {
     <QueryClientProvider client={queryClient}>
       <Script src='/core/facetec/FaceTecSDK.js' strategy='beforeInteractive' />
 
-      <div className='wrapping-box-container'>
-        {isAuth ? <Home /> : <Login />}
-      </div>
+      {isAuth ? <Home /> : <Login />}
     </QueryClientProvider>
   );
 }

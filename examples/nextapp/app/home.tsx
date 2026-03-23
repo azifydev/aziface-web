@@ -17,6 +17,7 @@ import {
   InitializeHeaders,
 } from '@/aziface';
 import { FaceType } from '@/types/services.types';
+import '@/aziface/aziface.css';
 
 export function Home() {
   const [isInitialized, setIsInitialized] = useState(false);

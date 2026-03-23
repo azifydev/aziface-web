@@ -1,7 +1,6 @@
 import {
   FaceTecInitializationError,
   FaceTecSDKInstance,
-  FaceTecSessionRequestProcessor,
   FaceTecSessionStatus,
 } from '@/public/core/facetec/FaceTecPublicApi';
 import { FaceTecSDK as FaceTecSDKType } from '@/public/core/facetec/FaceTecSDK';
@@ -103,14 +102,8 @@ export class AzifaceController implements Controller {
     if (AzifaceController.latestExternalDatabaseRefID.length === 0) {
       throw new SessionError(MethodError.NoUserEnrolled);
     } else {
-      const sessionRequestProcessor: FaceTecSessionRequestProcessor =
-        new SessionRequestProcessor(
-          AzifaceController.latestExternalDatabaseRefID,
-          this.onComplete,
-        );
-      this.faceTecSDKInstance.start3DLivenessThen3DFaceMatch(
-        sessionRequestProcessor,
-      );
+      const processor = this.makeSessionRequestProcessor();
+      this.faceTecSDKInstance.start3DLivenessThen3DFaceMatch(processor);
     }
   };
 
@@ -122,12 +115,8 @@ export class AzifaceController implements Controller {
     AzifaceController.latestExternalDatabaseRefID =
       this.generateExternalDatabaseRefID();
 
-    const sessionRequestProcessor: FaceTecSessionRequestProcessor =
-      new SessionRequestProcessor(
-        AzifaceController.latestExternalDatabaseRefID,
-        this.onComplete,
-      );
-    this.faceTecSDKInstance.start3DLiveness(sessionRequestProcessor);
+    const processor = this.makeSessionRequestProcessor();
+    this.faceTecSDKInstance.start3DLiveness(processor);
   };
 
   public liveness = (): void => {
@@ -137,12 +126,8 @@ export class AzifaceController implements Controller {
 
     AzifaceController.latestExternalDatabaseRefID = '';
 
-    const sessionRequestProcessor: FaceTecSessionRequestProcessor =
-      new SessionRequestProcessor(
-        AzifaceController.latestExternalDatabaseRefID,
-        this.onComplete,
-      );
-    this.faceTecSDKInstance.start3DLiveness(sessionRequestProcessor);
+    const processor = this.makeSessionRequestProcessor();
+    this.faceTecSDKInstance.start3DLiveness(processor);
   };
 
   public photoMatch = (): void => {
@@ -153,15 +138,8 @@ export class AzifaceController implements Controller {
     AzifaceController.latestExternalDatabaseRefID =
       this.generateExternalDatabaseRefID();
 
-    const sessionRequestProcessor: FaceTecSessionRequestProcessor =
-      new SessionRequestProcessor(
-        AzifaceController.latestExternalDatabaseRefID,
-        this.onComplete,
-      );
-
-    this.faceTecSDKInstance.start3DLivenessThen3D2DPhotoIDMatch(
-      sessionRequestProcessor,
-    );
+    const processor = this.makeSessionRequestProcessor();
+    this.faceTecSDKInstance.start3DLivenessThen3D2DPhotoIDMatch(processor);
   };
 
   public photoScan = (): void => {
@@ -172,15 +150,17 @@ export class AzifaceController implements Controller {
     AzifaceController.latestExternalDatabaseRefID =
       this.generateExternalDatabaseRefID();
 
-    const sessionRequestProcessor: FaceTecSessionRequestProcessor =
-      new SessionRequestProcessor(
-        AzifaceController.latestExternalDatabaseRefID,
-        this.onComplete,
-      );
-    this.faceTecSDKInstance.startIDScanOnly(sessionRequestProcessor);
+    const processor = this.makeSessionRequestProcessor();
+    this.faceTecSDKInstance.startIDScanOnly(processor);
   };
 
   public withTheme = (overrides?: Style): void => applyTheme(overrides);
+
+  private makeSessionRequestProcessor = (): SessionRequestProcessor =>
+    new SessionRequestProcessor(
+      AzifaceController.latestExternalDatabaseRefID,
+      this.onComplete,
+    );
 
   private setupController = (init: Initialize): void => {
     AzifaceController.deviceKeyIdentifier =
