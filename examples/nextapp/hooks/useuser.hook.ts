@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getString, storeClearAll, storeString } from '@/helpers';
 
 interface UseUserProps {
   token: string;
@@ -9,16 +10,19 @@ interface UseUserProps {
 }
 
 export const useUserStore = create<UseUserProps>(set => ({
-  token: '',
-  tokenBiometric: '',
+  token: getString('token') || '',
+  tokenBiometric: getString('tokenBiometric') || '',
   setToken: (token: string) => {
     set({ token });
+    storeString('token', token);
   },
   setTokenBiometric: (tokenBiometric: string) => {
     set({ tokenBiometric });
+    storeString('tokenBiometric', tokenBiometric);
   },
   logout: () => {
     set({ token: '', tokenBiometric: '' });
+    storeClearAll();
   },
 }));
 
