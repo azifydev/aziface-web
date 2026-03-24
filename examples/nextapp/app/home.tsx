@@ -42,7 +42,7 @@ export function Home() {
 
       setIsInitialized(initialized.isSuccess);
       if (error) {
-        toast.error(`${error.cause} - (${error.code})`);
+        toast.error(`(${error.code}) - ${error.cause}`);
       }
     });
   };
