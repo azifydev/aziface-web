@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getString, storeClearAll, storeString } from '@/helpers';
+import { persist } from 'zustand/middleware';
 
 interface UseUserProps {
   token: string;
@@ -9,21 +9,25 @@ interface UseUserProps {
   logout: () => void;
 }
 
-export const useUserStore = create<UseUserProps>(set => ({
-  token: getString('token') || '',
-  tokenBiometric: getString('tokenBiometric') || '',
-  setToken: (token: string) => {
-    set({ token });
-    storeString('token', token);
-  },
-  setTokenBiometric: (tokenBiometric: string) => {
-    set({ tokenBiometric });
-    storeString('tokenBiometric', tokenBiometric);
-  },
-  logout: () => {
-    set({ token: '', tokenBiometric: '' });
-    storeClearAll();
-  },
-}));
+export const useUserStore = create<UseUserProps>()(
+  persist(
+    set => ({
+      token: '',
+      tokenBiometric: '',
+      setToken: (token: string) => {
+        set({ token });
+      },
+      setTokenBiometric: (tokenBiometric: string) => {
+        set({ tokenBiometric });
+      },
+      logout: () => {
+        set({ token: '', tokenBiometric: '' });
+      },
+    }),
+    {
+      name: 'userStorage',
+    },
+  ),
+);
 
 export const useUser = useUserStore;
