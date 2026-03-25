@@ -6,7 +6,7 @@ import {
 import { FaceTecSDK as FaceTecSDKType } from '@/public/core/facetec/FaceTecSDK';
 import { SessionError } from './errors';
 import { SessionRequestProcessor } from './request-processor';
-import { applyTheme } from './theme';
+import { applyTheme, getBackgroundColor } from './theme';
 import { getInitializationErrorCauseByCode } from './utils';
 import {
   Controller,
@@ -104,6 +104,7 @@ export class AzifaceController implements Controller {
     } else {
       const processor = this.makeSessionRequestProcessor();
       this.faceTecSDKInstance.start3DLivenessThen3DFaceMatch(processor);
+      this.onAttach();
     }
   };
 
@@ -117,6 +118,7 @@ export class AzifaceController implements Controller {
 
     const processor = this.makeSessionRequestProcessor();
     this.faceTecSDKInstance.start3DLiveness(processor);
+    this.onAttach();
   };
 
   public liveness = (): void => {
@@ -128,6 +130,7 @@ export class AzifaceController implements Controller {
 
     const processor = this.makeSessionRequestProcessor();
     this.faceTecSDKInstance.start3DLiveness(processor);
+    this.onAttach();
   };
 
   public photoMatch = (): void => {
@@ -140,6 +143,7 @@ export class AzifaceController implements Controller {
 
     const processor = this.makeSessionRequestProcessor();
     this.faceTecSDKInstance.start3DLivenessThen3D2DPhotoIDMatch(processor);
+    this.onAttach();
   };
 
   public photoScan = (): void => {
@@ -152,6 +156,7 @@ export class AzifaceController implements Controller {
 
     const processor = this.makeSessionRequestProcessor();
     this.faceTecSDKInstance.startIDScanOnly(processor);
+    this.onAttach();
   };
 
   public withTheme = (overrides?: Style): void => applyTheme(overrides);
@@ -198,6 +203,18 @@ export class AzifaceController implements Controller {
       faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
     if (isError) {
       throw new SessionError(faceTecSessionStatus);
+    }
+  };
+
+  private onAttach = () => {
+    const container = document.getElementById(
+      'DOM_FT_PRIMARY_TOPLEVEL_mainContainer',
+    );
+
+    if (container) {
+      container.style.backgroundColor = getBackgroundColor();
+    } else {
+      throw new SessionError(MethodError.NotInitialized);
     }
   };
 }

@@ -149,3 +149,8 @@ export function applyTheme(theme?: Style): void {
   FaceTecSDK.setLowLightCustomization(currentCustomization);
   FaceTecSDK.setDynamicDimmingCustomization(currentCustomization);
 }
+
+export function getBackgroundColor(): string {
+  const customization = new FaceTecSDK.FaceTecCustomization();
+  return customization.overlayCustomization.backgroundColor || '#FFFFFF';
+}
