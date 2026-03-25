@@ -295,6 +295,29 @@ export interface DisposeCallback {
   (disposed: boolean): void;
 }
 
+/**
+ * @type Locale
+ *
+ * @description A type that represents the supported locale options for the
+ * Aziface SDK. This type includes a list of language codes that can be used to
+ * set the locale of the SDK.
+ */
+export type Locale =
+  | 'af'
+  | 'ar'
+  | 'de'
+  | 'el'
+  | 'en'
+  | 'es'
+  | 'fr'
+  | 'ja'
+  | 'kk'
+  | 'no'
+  | 'pt-BR'
+  | 'ru'
+  | 'vi'
+  | 'zh';
+
 export interface Controller {
   initialize: (init: Initialize, callback: InitializeCallback) => void;
   dispose: (callback: DisposeCallback) => void;
@@ -304,4 +327,5 @@ export interface Controller {
   photoScan: () => void;
   photoMatch: () => void;
   withTheme: (overrides?: Style) => void;
+  setLocale: (locale: Locale) => void;
 }

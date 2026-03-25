@@ -8,6 +8,7 @@ export {
   photoScan,
   resetTheme,
   withTheme,
+  setLocale,
 } from './aziface';
 
 export type {
@@ -21,6 +22,7 @@ export type {
   InitializeResponse,
   MethodError,
   SessionCode,
+  Locale,
   Style,
 } from './types';
 

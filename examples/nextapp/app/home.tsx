@@ -12,15 +12,19 @@ import {
   liveness,
   photoMatch,
   photoScan,
+  setLocale,
   SessionError,
   InitializeParams,
   InitializeHeaders,
+  Locale,
 } from '@/aziface';
 import { FaceType } from '@/types/services.types';
+import { LOCALES } from '@/constants';
 import '@/aziface/aziface.css';
 
 export function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [i18n, setI18n] = useState<Locale>('en');
 
   const { data: configs } = useBiometricConfigs();
   const { tokenBiometric, logout } = useUser();
@@ -37,12 +41,14 @@ export function Home() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, initialized => {
+    initialize({ params, headers }, async initialized => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
       if (error) {
         toast.error(`(${error.code}) - ${error.cause}`);
+      } else {
+        await setLocale(i18n);
       }
     });
   };
@@ -55,6 +61,14 @@ export function Home() {
         toast.error('Failed to dispose SDK.');
       }
     });
+  };
+
+  const onLocale = async (): Promise<void> => {
+    const locales = LOCALES.filter(loc => loc !== i18n);
+    const newLocale = locales[Math.floor(Math.random() * locales.length)];
+
+    setI18n(newLocale);
+    await setLocale(newLocale);
   };
 
   const onFaceScan = (type: FaceType): void => {
@@ -139,6 +153,14 @@ export function Home() {
             className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Photo Scan
+          </button>
+
+          <button
+            onClick={onLocale}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Locale: {i18n}
           </button>
 
           <button

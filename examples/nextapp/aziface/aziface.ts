@@ -14,9 +14,11 @@ import {
   Initialize,
   InitializeCallback,
   InitializeHeaders,
+  Locale,
   MethodError,
   Style,
 } from './types';
+import { i18n } from './i18n';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
@@ -161,6 +163,14 @@ export class AzifaceController implements Controller {
 
   public withTheme = (overrides?: Style): void => applyTheme(overrides);
 
+  public setLocale = (locale: Locale): void => {
+    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
+      throw new SessionError(MethodError.NotInitialized);
+    } else {
+      FaceTecSDK.configureLocalization(i18n[locale]);
+    }
+  };
+
   private makeSessionRequestProcessor = (): SessionRequestProcessor =>
     new SessionRequestProcessor(
       AzifaceController.latestExternalDatabaseRefID,
@@ -258,4 +268,8 @@ export function withTheme(overrides?: Style): void {
 
 export function resetTheme(): void {
   controller.withTheme();
+}
+
+export function setLocale(locale: Locale): void {
+  controller.setLocale(locale);
 }

@@ -21,6 +21,8 @@ Web SDK adapter for React.
     - [`Custom images`](#custom-images)
       - [`Example`](#example)
   - [`resetTheme`](#resettheme)
+  - [`setLocale`](#setlocale)
+    - [`Properties`](#properties-3)
 - [Types](#types)
   - [`Initialize`](#initialize-1)
     - [`InitializeParams`](#initializeparams)
@@ -30,6 +32,7 @@ Web SDK adapter for React.
       - [`InitializeError`](#initializeerror)
   - [`DisposeCallback`](#disposecallback)
   - [`Style`](#style)
+  - [`Locale`](#locale)
 - [Enums](#enums)
   - [`InitializeCodeError`](#initializecodeerror)
   - [`SessionCode`](#sessioncodeerror)
@@ -202,17 +205,18 @@ export function MyPage() {
 
 ## API
 
-| Methods      | Return type |
-| ------------ | ----------- |
-| `initialize` | `void`      |
-| `dispose`    | `void`      |
-| `callback`   | `void`      |
-| `callback`   | `void`      |
-| `callback`   | `void`      |
-| `callback`   | `void`      |
-| `callback`   | `void`      |
-| `callback`   | `void`      |
-| `callback`   | `void`      |
+| Methods        | Return type |
+| -------------- | ----------- |
+| `initialize`   | `void`      |
+| `dispose`      | `void`      |
+| `enroll`       | `void`      |
+| `authenticate` | `void`      |
+| `liveness`     | `void`      |
+| `photoScan`    | `void`      |
+| `photoMatch`   | `void`      |
+| `withTheme`    | `void`      |
+| `resetTheme`   | `void`      |
+| `setLocale`    | `void`      |
 
 ### `initialize`
 
@@ -324,9 +328,7 @@ A successful document-only verification is suitable for lower-risk scenarios or 
 
 ### `withTheme`
 
-This method customize your SDK theme during session.
-
-**Note**: The `withTheme` must be used after the SDK is initialized.
+This method customize your SDK theme during session. The Aziface SDK must be successfully initialized **before calling** this API.
 
 ```ts
 initialize(
@@ -384,6 +386,37 @@ initialize(
 ### `resetTheme`
 
 The `resetTheme` is a fallback method to return default theme.
+
+### `setLocale`
+
+The `setLocale` method in the Aziface SDK is used to define the language and locale used by the SDK’s user interface and vocal guidance during verification sessions. The Aziface SDK must be successfully initialized **before calling** this API.
+
+By calling this method, the application specifies which language the SDK should use for on-screen text, voice prompts, and user instructions. This allows the SDK to present a localized experience that matches the user’s preferred or device language.
+
+The selected language applies to all Aziface SDK workflows, including enrollment, authentication, liveness checks, photo scan, and photo match verification. The language must be set before starting a session to ensure consistent localization throughout the user interaction.
+
+If an unsupported or invalid language code is provided, the SDK falls back to a default language (en) and returns appropriate status or error information, depending on the platform implementation.
+
+```ts
+initialize(
+  {
+    // ...
+  },
+  initialized => {
+    if (initialized.error && !initialized.isSuccess) {
+      // ...
+    } else {
+      setLocale('pt-br');
+    }
+  },
+);
+```
+
+#### Properties
+
+| Property | Type                | Required | Default     |
+| -------- | ------------------- | -------- | ----------- |
+| `locale` | [`Locale`](#locale) | ✅       | `undefined` |
 
 <hr/>
 
@@ -470,6 +503,27 @@ Customize your Aziface SDK using `Style` object.
 | `frameCornerRadius`             | `string` | ❌       | `20px`      |
 | `cancelImage`                   | `string` | ❌       | `undefined` |
 | `brandingImage`                 | `string` | ❌       | `undefined` |
+
+### Locale
+
+The `Locale` type uses the [ISO 639](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) language codes pattern.
+
+| type    | Description                     |
+| ------- | ------------------------------- |
+| `af`    | Afrikaans language.             |
+| `ar`    | Arabic language.                |
+| `de`    | German language.                |
+| `el`    | Greek language.                 |
+| `en`    | English language.               |
+| `es`    | Spanish and Castilian language. |
+| `fr`    | French language.                |
+| `ja`    | Japanese language.              |
+| `kk`    | Kazakh language.                |
+| `no`    | Norwegian Bokmål language.      |
+| `pt-BR` | Portuguese Brazilian language.  |
+| `ru`    | Russian language.               |
+| `vi`    | Vietnamese language.            |
+| `zh`    | Chinese language.               |
 
 <hr/>
 
