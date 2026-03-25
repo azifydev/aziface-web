@@ -187,7 +187,7 @@ export class AzifaceController implements Controller {
   };
 
   private generateExternalDatabaseRefID = (): string =>
-    'aziface_web_' + crypto.randomUUID();
+    `aziface_web_${crypto.randomUUID()}`;
 
   private onInitializationSuccess = (
     newFaceTecSdkInstance: FaceTecSDKInstance,
