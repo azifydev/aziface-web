@@ -96,78 +96,68 @@ export class AzifaceController implements Controller {
     }
   };
 
-  public authenticate = (): void => {
-    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
-      throw new SessionError(MethodError.NotInitialized);
-    }
+  public authenticate = (): void =>
+    this.decorator(instance => {
+      if (AzifaceController.latestExternalDatabaseRefID.length === 0) {
+        throw new SessionError(MethodError.NoUserEnrolled);
+      } else {
+        const processor = this.makeSessionRequestProcessor();
+        instance.start3DLivenessThen3DFaceMatch(processor);
+        this.onAttach();
+      }
+    });
 
-    if (AzifaceController.latestExternalDatabaseRefID.length === 0) {
-      throw new SessionError(MethodError.NoUserEnrolled);
-    } else {
+  public enroll = (): void =>
+    this.decorator(instance => {
+      AzifaceController.latestExternalDatabaseRefID =
+        this.generateExternalDatabaseRefID();
+
       const processor = this.makeSessionRequestProcessor();
-      this.faceTecSDKInstance.start3DLivenessThen3DFaceMatch(processor);
+      instance.start3DLiveness(processor);
       this.onAttach();
-    }
-  };
+    });
 
-  public enroll = (): void => {
-    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
-      throw new SessionError(MethodError.NotInitialized);
-    }
+  public liveness = (): void =>
+    this.decorator(instance => {
+      AzifaceController.latestExternalDatabaseRefID = '';
 
-    AzifaceController.latestExternalDatabaseRefID =
-      this.generateExternalDatabaseRefID();
+      const processor = this.makeSessionRequestProcessor();
+      instance.start3DLiveness(processor);
+      this.onAttach();
+    });
 
-    const processor = this.makeSessionRequestProcessor();
-    this.faceTecSDKInstance.start3DLiveness(processor);
-    this.onAttach();
-  };
+  public photoMatch = (): void =>
+    this.decorator(instance => {
+      AzifaceController.latestExternalDatabaseRefID =
+        this.generateExternalDatabaseRefID();
 
-  public liveness = (): void => {
-    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
-      throw new SessionError(MethodError.NotInitialized);
-    }
+      const processor = this.makeSessionRequestProcessor();
+      instance.start3DLivenessThen3D2DPhotoIDMatch(processor);
+      this.onAttach();
+    });
 
-    AzifaceController.latestExternalDatabaseRefID = '';
+  public photoScan = (): void =>
+    this.decorator(instance => {
+      AzifaceController.latestExternalDatabaseRefID =
+        this.generateExternalDatabaseRefID();
 
-    const processor = this.makeSessionRequestProcessor();
-    this.faceTecSDKInstance.start3DLiveness(processor);
-    this.onAttach();
-  };
-
-  public photoMatch = (): void => {
-    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
-      throw new SessionError(MethodError.NotInitialized);
-    }
-
-    AzifaceController.latestExternalDatabaseRefID =
-      this.generateExternalDatabaseRefID();
-
-    const processor = this.makeSessionRequestProcessor();
-    this.faceTecSDKInstance.start3DLivenessThen3D2DPhotoIDMatch(processor);
-    this.onAttach();
-  };
-
-  public photoScan = (): void => {
-    if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
-      throw new SessionError(MethodError.NotInitialized);
-    }
-
-    AzifaceController.latestExternalDatabaseRefID =
-      this.generateExternalDatabaseRefID();
-
-    const processor = this.makeSessionRequestProcessor();
-    this.faceTecSDKInstance.startIDScanOnly(processor);
-    this.onAttach();
-  };
+      const processor = this.makeSessionRequestProcessor();
+      instance.startIDScanOnly(processor);
+      this.onAttach();
+    });
 
   public withTheme = (overrides?: Style): void => applyTheme(overrides);
 
-  public setLocale = (locale: Locale): void => {
+  public setLocale = (locale: Locale): void =>
+    this.decorator(() => FaceTecSDK.configureLocalization(i18n[locale]));
+
+  private decorator = (
+    callback: (instance: FaceTecSDKInstance) => void,
+  ): void => {
     if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
       throw new SessionError(MethodError.NotInitialized);
     } else {
-      FaceTecSDK.configureLocalization(i18n[locale]);
+      callback(this.faceTecSDKInstance);
     }
   };
 

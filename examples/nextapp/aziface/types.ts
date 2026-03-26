@@ -1,6 +1,6 @@
 import {
-  FaceTecInitializationError as InitializeCodeError,
-  FaceTecSessionStatus as SessionCode,
+  FaceTecInitializationError,
+  FaceTecSessionStatus,
 } from '@/public/core/facetec/FaceTecPublicApi';
 
 /**
@@ -21,6 +21,25 @@ export enum MethodError {
    */
   NoUserEnrolled = 10,
 }
+
+/**
+ * @type SessionCode
+ *
+ * @description A type that represents the possible status codes that can be
+ * returned from a session, including both the status codes defined by the
+ * Aziface SDK and custom method error codes defined in this application.
+ */
+export type SessionCode = FaceTecSessionStatus | MethodError;
+
+/**
+ * @type InitializeCodeError
+ *
+ * @description A type that represents the possible status codes that can be
+ * returned from the `initialize()` method, including both the status codes
+ * defined by the Aziface SDK and custom method error codes defined in this
+ * application.
+ */
+export type InitializeCodeError = FaceTecInitializationError;
 
 /**
  * @interface InitializeParams
@@ -310,24 +329,3 @@ export interface Controller {
   withTheme: (overrides?: Style) => void;
   setLocale: (locale: Locale) => void;
 }
-
-export {
-  /**
-   * @enum InitializeCodeError
-   *
-   * @description A type that represents the possible status codes that can be
-   * returned from the `initialize()` method, including both the status codes
-   * defined by the Aziface SDK and custom method error codes defined in this
-   * application.
-   */
-  InitializeCodeError,
-
-  /**
-   * @enum SessionCode
-   *
-   * @description A type that represents the possible status codes that can be
-   * returned from a session, including both the status codes defined by the
-   * Aziface SDK and custom method error codes defined in this application.
-   */
-  SessionCode,
-};

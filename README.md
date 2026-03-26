@@ -30,13 +30,11 @@ Web SDK adapter for React.
   - [`InitializeCallback`](#initializecallback)
     - [`InitializeResponse`](#initializeresponse)
       - [`InitializeError`](#initializeerror)
+        - [`InitializeCodeError`](#initializecodeerror)
   - [`DisposeCallback`](#disposecallback)
+  - [`SessionCode`](#sessioncode)
   - [`Style`](#style)
   - [`Locale`](#locale)
-- [Enums](#enums)
-  - [`InitializeCodeError`](#initializecodeerror)
-  - [`SessionCode`](#sessioncode)
-  - [`MethodError`](#methoderror)
 - [Classes](#classes)
   - [`SessionError`](#sessionerror)
     - [`constructor`](#constructor)
@@ -477,6 +475,37 @@ The initialize method return an `InitializeError` object when some error occurs.
 | `code`   | [`InitializeCodeError`](#initializecodeerror) | ✅       |
 | `cause`  | `string`                                      | ✅       |
 
+###### `InitializeCodeError`
+
+The initialize code error is a type identifier of the error in the SDK.
+
+| Code                                  | Description                                                                           | Identifier |
+| ------------------------------------- | ------------------------------------------------------------------------------------- | ---------- |
+| `RejectedByServer`                    | The Aziface Server could not validate this application.                               | `0`        |
+| `RequestAborted`                      | When request has catastrophic error and the application could not be validated.       | `1`        |
+| `DeviceNotSupported`                  | This device/platform/browser/version combination is not supported by the Aziface SDK. | `2`        |
+| `UnknownInternalError`                | An unknown and unexpected error occurred.                                             | `3`        |
+| `ResourcesCouldNotBeLoadedOnLastInit` | Aziface SDK could not load resources.                                                 | `4`        |
+| `GetUserMediaRemoteHTTPNotSupported`  | Browser Camera APIs are only supported on localhost or https.                         | `5`        |
+
+###### `SessionCode`
+
+The session code is a type identifier of the session when a method fails or it has success.
+
+| Code                                | Description                                                                                                                                                  | Identifier |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| `SessionCompleted`                  | The Session was completed.                                                                                                                                   | `0`        |
+| `RequestAborted`                    | When session has catastrophic error and the application could not be validated.                                                                              | `1`        |
+| `UserCancelledFaceScan`             | The user cancelled before performing enough scans to cucceed.                                                                                                | `2`        |
+| `UserCancelledIDScan`               | The user cancelled before completing all of the steps in the ID Scan Process.                                                                                | `3`        |
+| `LockedOut`                         | The session was cancelled because the user was in a locked out state.                                                                                        | `4`        |
+| `CameraError`                       | The session was cancelled because Aziface SDK was unable to start the camera on this device, or an unexpected error occurred with the camera during runtime. | `5`        |
+| `CameraPermissionsDenied`           | The session was cancelled because camera permissions were not enabled.                                                                                       | `6`        |
+| `UnknownInternalError`              | An unknown and unexpected error occurred.                                                                                                                    | `7`        |
+| `IFrameNotAllowedWithoutPermission` | The session was cancelled, the Aziface SDK was opened in an Iframe without permission.                                                                       | `8`        |
+| `NotInitialized`                    | This error code indicates that the Aziface SDK has not been initialized.                                                                                     | `9`        |
+| `NoUserEnrolled`                    | No user enrolled. Please enroll a user before attempting to authenticate.                                                                                    | `10`       |
+
 ### `DisposeCallback`
 
 Get dispose response using the `DisposeCallback`.
@@ -528,66 +557,24 @@ The `Locale` type uses the [ISO 639](https://en.wikipedia.org/wiki/List_of_ISO_6
 
 <hr/>
 
-## Enums
-
-### `InitializeCodeError`
-
-The initialize code error is a type identifier of the error in the SDK.
-
-| Code                                  | Description                                                                           | Identifier |
-| ------------------------------------- | ------------------------------------------------------------------------------------- | ---------- |
-| `RejectedByServer`                    | The Aziface Server could not validate this application.                               | `0`        |
-| `RequestAborted`                      | When request has catastrophic error and the application could not be validated.       | `1`        |
-| `DeviceNotSupported`                  | This device/platform/browser/version combination is not supported by the Aziface SDK. | `2`        |
-| `UnknownInternalError`                | An unknown and unexpected error occurred.                                             | `3`        |
-| `ResourcesCouldNotBeLoadedOnLastInit` | Aziface SDK could not load resources.                                                 | `4`        |
-| `GetUserMediaRemoteHTTPNotSupported`  | Browser Camera APIs are only supported on localhost or https.                         | `5`        |
-
-### `SessionCode`
-
-The session code is a type identifier of the session when a method fails or it has success.
-
-| Code                                | Description                                                                                                                                                  | Identifier |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| `SessionCompleted`                  | The Session was completed.                                                                                                                                   | `0`        |
-| `RequestAborted`                    | When session has catastrophic error and the application could not be validated.                                                                              | `1`        |
-| `UserCancelledFaceScan`             | The user cancelled before performing enough scans to cucceed.                                                                                                | `2`        |
-| `UserCancelledIDScan`               | The user cancelled before completing all of the steps in the ID Scan Process.                                                                                | `3`        |
-| `LockedOut`                         | The session was cancelled because the user was in a locked out state.                                                                                        | `4`        |
-| `CameraError`                       | The session was cancelled because Aziface SDK was unable to start the camera on this device, or an unexpected error occurred with the camera during runtime. | `5`        |
-| `CameraPermissionsDenied`           | The session was cancelled because camera permissions were not enabled.                                                                                       | `6`        |
-| `UnknownInternalError`              | An unknown and unexpected error occurred.                                                                                                                    | `7`        |
-| `IFrameNotAllowedWithoutPermission` | The session was cancelled, the Aziface SDK was opened in an Iframe without permission.                                                                       | `8`        |
-
-### `MethodError`
-
-The method error is a type identifier of the method when it fails because it's not initialized or no user enrolled.
-
-| Code             | Description                                                               | Identifier |
-| ---------------- | ------------------------------------------------------------------------- | ---------- |
-| `NotInitialized` | This error code indicates that the Aziface SDK has not been initialized.  | `9`        |
-| `NoUserEnrolled` | No user enrolled. Please enroll a user before attempting to authenticate. | `10`       |
-
-<hr/>
-
 ## Classes
 
 ### `SessionError`
 
 A `SessionError` class is returned when an error is thrown by the Aziface SDK.
 
-| Property  | Type                                                           | Required |
-| --------- | -------------------------------------------------------------- | -------- |
-| `code`    | [`SessionCode`](#sessioncode) or [`MethodError`](#methoderror) | ✅       |
-| `name`    | `string`                                                       | ✅       |
-| `message` | `string`                                                       | ✅       |
-| `cause`   | `string`                                                       | ✅       |
-| `stack`   | `string`                                                       | ❌       |
+| Property  | Type                          | Required |
+| --------- | ----------------------------- | -------- |
+| `code`    | [`SessionCode`](#sessioncode) | ✅       |
+| `name`    | `string`                      | ✅       |
+| `message` | `string`                      | ✅       |
+| `cause`   | `string`                      | ✅       |
+| `stack`   | `string`                      | ❌       |
 
 #### `constructor`
 
 The `constructor` receives `code` as an argument.
 
-| Property | Type                                                           | Required |
-| -------- | -------------------------------------------------------------- | -------- |
-| `code`   | [`SessionCode`](#sessioncode) or [`MethodError`](#methoderror) | ✅       |
+| Property | Type                          | Required |
+| -------- | ----------------------------- | -------- |
+| `code`   | [`SessionCode`](#sessioncode) | ✅       |

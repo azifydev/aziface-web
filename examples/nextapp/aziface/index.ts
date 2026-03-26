@@ -21,7 +21,6 @@ export type {
   InitializeParams,
   InitializeResponse,
   Locale,
-  MethodError,
   SessionCode,
   Style,
 } from './types';
