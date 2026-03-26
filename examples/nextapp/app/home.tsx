@@ -41,14 +41,14 @@ export function Home() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, async initialized => {
+    initialize({ params, headers }, initialized => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
       if (error) {
         toast.error(`(${error.code}) - ${error.cause}`);
       } else {
-        await setLocale(i18n);
+        setLocale(i18n);
       }
     });
   };

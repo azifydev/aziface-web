@@ -35,7 +35,8 @@ Web SDK adapter for React.
   - [`Locale`](#locale)
 - [Enums](#enums)
   - [`InitializeCodeError`](#initializecodeerror)
-  - [`SessionCode`](#sessioncodeerror)
+  - [`SessionCode`](#sessioncode)
+  - [`MethodError`](#methoderror)
 - [Classes](#classes)
   - [`SessionError`](#sessionerror)
     - [`constructor`](#constructor)
@@ -557,8 +558,15 @@ The session code is a type identifier of the session when a method fails or it h
 | `CameraPermissionsDenied`           | The session was cancelled because camera permissions were not enabled.                                                                                       | `6`        |
 | `UnknownInternalError`              | An unknown and unexpected error occurred.                                                                                                                    | `7`        |
 | `IFrameNotAllowedWithoutPermission` | The session was cancelled, the Aziface SDK was opened in an Iframe without permission.                                                                       | `8`        |
-| `NotInitialized`                    | This error code indicates that the Aziface SDK has not been initialized.                                                                                     | `9`        |
-| `NoUserEnrolled`                    | No user enrolled. Please enroll a user before attempting to authenticate.                                                                                    | `10`       |
+
+### `MethodError`
+
+The method error is a type identifier of the method when it fails because it's not initialized or no user enrolled.
+
+| Code             | Description                                                               | Identifier |
+| ---------------- | ------------------------------------------------------------------------- | ---------- |
+| `NotInitialized` | This error code indicates that the Aziface SDK has not been initialized.  | `9`        |
+| `NoUserEnrolled` | No user enrolled. Please enroll a user before attempting to authenticate. | `10`       |
 
 <hr/>
 
@@ -568,18 +576,18 @@ The session code is a type identifier of the session when a method fails or it h
 
 A `SessionError` class is returned when an error is thrown by the Aziface SDK.
 
-| Property  | Type                          | Required |
-| --------- | ----------------------------- | -------- |
-| `code`    | [`SessionCode`](#sessioncode) | ✅       |
-| `name`    | `string`                      | ✅       |
-| `message` | `string`                      | ✅       |
-| `cause`   | `string`                      | ✅       |
-| `stack`   | `string`                      | ❌       |
+| Property  | Type                                                           | Required |
+| --------- | -------------------------------------------------------------- | -------- |
+| `code`    | [`SessionCode`](#sessioncode) or [`MethodError`](#methoderror) | ✅       |
+| `name`    | `string`                                                       | ✅       |
+| `message` | `string`                                                       | ✅       |
+| `cause`   | `string`                                                       | ✅       |
+| `stack`   | `string`                                                       | ❌       |
 
 #### `constructor`
 
 The `constructor` receives `code` as an argument.
 
-| Property | Type                          | Required |
-| -------- | ----------------------------- | -------- |
-| `code`   | [`SessionCode`](#sessioncode) | ✅       |
+| Property | Type                                                           | Required |
+| -------- | -------------------------------------------------------------- | -------- |
+| `code`   | [`SessionCode`](#sessioncode) or [`MethodError`](#methoderror) | ✅       |

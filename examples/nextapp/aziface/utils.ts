@@ -27,7 +27,9 @@ export function getInitializationErrorCauseByCode(
   }
 }
 
-export function getSessionStatusCauseByCode(value: SessionCode): string {
+export function getSessionStatusCauseByCode(
+  value: SessionCode | MethodError,
+): string {
   switch (value) {
     case FaceTecSDK.FaceTecSessionStatus.SessionCompleted:
       return 'The session was performed successfully.';

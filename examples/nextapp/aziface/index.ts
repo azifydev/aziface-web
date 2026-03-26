@@ -20,9 +20,9 @@ export type {
   InitializeHeaders,
   InitializeParams,
   InitializeResponse,
+  Locale,
   MethodError,
   SessionCode,
-  Locale,
   Style,
 } from './types';
 
