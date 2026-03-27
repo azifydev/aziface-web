@@ -9,7 +9,7 @@ export {
   resetTheme,
   withTheme,
   setLocale,
-} from './aziface';
+} from './module/aziface';
 
 export type {
   DisposeCallback,
@@ -25,4 +25,4 @@ export type {
   Style,
 } from './types/aziface';
 
-export { SessionError } from './errors';
+export { SessionError } from './errors/errors';

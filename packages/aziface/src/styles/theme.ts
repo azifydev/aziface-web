@@ -1,10 +1,10 @@
-import { FaceTecSDK as FaceTecSDKType } from '@/aziface/types/FaceTecSDK';
-import { Style } from './types/aziface';
+import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
+import { Style } from '../types/aziface';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
 function retrieveConfigurationWizardCustomization(theme?: Style) {
-  const sdkImageDirectory = `${process.env.NEXT_PUBLIC_AZIFACE_ASSETS_URL}/core/images/`;
+  const sdkImageDirectory = `${process.env.AZIFACE_ASSETS_URL}/core/images/`;
   // For Color Customization
   const outerBackgroundColor = theme?.backgroundColor || '#FFFFFF';
   const frameColor = theme?.frameColor || '#FFFFFF';

@@ -17,10 +17,10 @@ import {
   InitializeParams,
   InitializeHeaders,
   Locale,
-} from '@/aziface';
+} from '@azify/aziface-web';
 import { FaceType } from '@/types/services.types';
 import { LOCALES } from '@/constants';
-import '@/aziface/aziface.css';
+import '@azify/aziface-web/dist/aziface.css';
 
 export function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -41,7 +41,7 @@ export function Home() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, initialized => {
+    initialize({ params, headers }, (initialized) => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
@@ -54,7 +54,7 @@ export function Home() {
   };
 
   const onDispose = (): void => {
-    dispose(disposed => {
+    dispose((disposed) => {
       setIsInitialized(!disposed);
 
       if (!disposed) {
@@ -64,7 +64,7 @@ export function Home() {
   };
 
   const onLocale = async (): Promise<void> => {
-    const locales = LOCALES.filter(loc => loc !== i18n);
+    const locales = LOCALES.filter((loc) => loc !== i18n);
     const newLocale = locales[Math.floor(Math.random() * locales.length)];
 
     setI18n(newLocale);

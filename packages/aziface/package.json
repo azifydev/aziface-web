@@ -1,0 +1,17 @@
+{
+  "name": "@azify/aziface-web",
+  "version": "1.0.0",
+  "description": "Web SDK adapter.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}

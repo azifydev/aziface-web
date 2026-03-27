@@ -1,4 +1,4 @@
-import { Locale } from '@/aziface';
+import { Locale } from '@azify/aziface-web';
 
 export const LOCALES: Locale[] = [
   'en',

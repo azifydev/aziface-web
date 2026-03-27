@@ -2,7 +2,7 @@ import {
   FaceTecSessionRequestProcessorCallback,
   FaceTecSessionResult,
   FaceTecSessionStatus,
-} from '@/aziface/types/FaceTecPublicApi';
+} from '../types/FaceTecPublicApi';
 import { FaceTecTestingAPINetworkingRequest } from './networking-request';
 
 export class SessionRequestProcessor {

@@ -1,6 +1,6 @@
-import { FaceTecInitializationError } from '@/aziface/types/FaceTecPublicApi';
-import { FaceTecSDK as FaceTecSDKType } from '@/aziface/types/FaceTecSDK';
-import { MethodError, SessionCode } from './types/aziface';
+import { FaceTecInitializationError } from '../types/FaceTecPublicApi';
+import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
+import { MethodError, SessionCode } from '../types/aziface';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 

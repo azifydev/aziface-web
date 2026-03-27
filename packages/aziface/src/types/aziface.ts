@@ -1,4 +1,4 @@
-import { FaceTecInitializationError, FaceTecSessionStatus } from '@/aziface/types/FaceTecPublicApi';
+import { FaceTecInitializationError, FaceTecSessionStatus } from '../types/FaceTecPublicApi';
 
 /**
  * @enum MethodError

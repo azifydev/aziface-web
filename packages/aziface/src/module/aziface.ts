@@ -1,9 +1,9 @@
-import { FaceTecInitializationError, FaceTecSDKInstance, FaceTecSessionStatus } from '@/aziface/types/FaceTecPublicApi';
-import { FaceTecSDK as FaceTecSDKType } from '@/aziface/types/FaceTecSDK';
-import { SessionError } from './errors';
-import { SessionRequestProcessor } from './request-processor';
-import { applyTheme, getBackgroundColor } from './theme';
-import { getInitializationErrorCauseByCode } from './utils';
+import { FaceTecInitializationError, FaceTecSDKInstance, FaceTecSessionStatus } from '../types/FaceTecPublicApi';
+import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
+import { SessionError } from '../errors/errors';
+import { SessionRequestProcessor } from '../services/request-processor';
+import { applyTheme, getBackgroundColor } from '../styles/theme';
+import { getInitializationErrorCauseByCode } from '../utils/utils';
 import {
   Controller,
   DisposeCallback,
@@ -13,8 +13,8 @@ import {
   Locale,
   MethodError,
   Style,
-} from './types/aziface';
-import { i18n } from './i18n';
+} from '../types/aziface';
+import { i18n } from '../i18n';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
@@ -26,7 +26,7 @@ export class AzifaceController implements Controller {
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
-  private static assetsUrl: string = process.env.NEXT_PUBLIC_AZIFACE_ASSETS_URL || '';
+  private static assetsUrl: string = process.env.AZIFACE_ASSETS_URL || '';
   public initialize = (init: Initialize, callback: InitializeCallback): void => {
     this.setupController(init);
 

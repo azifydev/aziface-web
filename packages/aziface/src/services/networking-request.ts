@@ -1,9 +1,9 @@
-import { FaceTecSDK as FaceTecSDKType } from '@/aziface/types/FaceTecSDK';
-import type { FaceTecSessionRequestProcessorCallback } from '@/aziface/types/FaceTecPublicApi';
+import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
+import type { FaceTecSessionRequestProcessorCallback } from '../types/FaceTecPublicApi';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
-import { AzifaceController } from './aziface';
+import { AzifaceController } from '../module/aziface';
 
 // Sample class for handling networking calls needed in order for FaceTec to function correctly.
 // In Your App, please use the networking constructs and protocols that meet your security requirements.
