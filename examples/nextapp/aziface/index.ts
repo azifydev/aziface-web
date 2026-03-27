@@ -23,6 +23,6 @@ export type {
   Locale,
   SessionCode,
   Style,
-} from './types';
+} from './types/aziface';
 
 export { SessionError } from './errors';
