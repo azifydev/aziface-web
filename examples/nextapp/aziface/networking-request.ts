@@ -1,5 +1,5 @@
-import { FaceTecSDK as FaceTecSDKType } from '@/public/core/facetec/FaceTecSDK';
-import type { FaceTecSessionRequestProcessorCallback } from '@/public/core/facetec/FaceTecPublicApi';
+import { FaceTecSDK as FaceTecSDKType } from '@/aziface/types/FaceTecSDK';
+import type { FaceTecSessionRequestProcessorCallback } from '@/aziface/types/FaceTecPublicApi';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
@@ -47,17 +47,11 @@ export class FaceTecTestingAPINetworkingRequest {
 
     // Developer Note: This is ONLY needed for calls to the FaceTec Testing API.
     // You should remove this when using Your App connected to Your Webservice + FaceTec Server
-    this.request.setRequestHeader(
-      'X-Device-Key',
-      AzifaceController.deviceKeyIdentifier,
-    );
+    this.request.setRequestHeader('X-Device-Key', AzifaceController.deviceKeyIdentifier);
     // Developer Note: This is ONLY needed for calls to the FaceTec Testing API.
     // You should remove this when using Your App connected to Your Webservice + FaceTec Server
     if (AzifaceController.isDevelopment) {
-      this.request.setRequestHeader(
-        'X-Testing-API-Header',
-        FaceTecSDK.getTestingAPIHeader(),
-      );
+      this.request.setRequestHeader('X-Testing-API-Header', FaceTecSDK.getTestingAPIHeader());
     }
 
     Object.entries(AzifaceController.headers).forEach(([key, value]) => {
@@ -117,13 +111,8 @@ export class FaceTecTestingAPINetworkingRequest {
     };
 
     // Send the payload
-    if (
-      typeof faceTecTestingAPIPayload === 'object' &&
-      Object.keys(faceTecTestingAPIPayload).length > 0
-    ) {
-      const faceTecTestingAPIPayloadJSON = JSON.parse(
-        JSON.stringify(faceTecTestingAPIPayload),
-      );
+    if (typeof faceTecTestingAPIPayload === 'object' && Object.keys(faceTecTestingAPIPayload).length > 0) {
+      const faceTecTestingAPIPayloadJSON = JSON.parse(JSON.stringify(faceTecTestingAPIPayload));
 
       if (faceTecTestingAPIPayload.externalDatabaseRefID.length === 0) {
         delete faceTecTestingAPIPayloadJSON.externalDatabaseRefID;
@@ -135,9 +124,7 @@ export class FaceTecTestingAPINetworkingRequest {
     }
   };
 
-  public processResponse = (
-    onResponseBlobReceived: (responseBlob: string) => void,
-  ): void => {
+  public processResponse = (onResponseBlobReceived: (responseBlob: string) => void): void => {
     const parsedResponse: {
       responseBlob: string;
       result?: { [key: string]: string | undefined };

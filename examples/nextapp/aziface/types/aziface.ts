@@ -1,7 +1,4 @@
-import {
-  FaceTecInitializationError,
-  FaceTecSessionStatus,
-} from '@/public/core/facetec/FaceTecPublicApi';
+import { FaceTecInitializationError, FaceTecSessionStatus } from '@/aziface/types/FaceTecPublicApi';
 
 /**
  * @enum MethodError
@@ -302,21 +299,7 @@ export interface DisposeCallback {
  * Aziface SDK. This type includes a list of language codes that can be used to
  * set the locale of the SDK.
  */
-export type Locale =
-  | 'af'
-  | 'ar'
-  | 'de'
-  | 'el'
-  | 'en'
-  | 'es'
-  | 'fr'
-  | 'ja'
-  | 'kk'
-  | 'no'
-  | 'pt-BR'
-  | 'ru'
-  | 'vi'
-  | 'zh';
+export type Locale = 'af' | 'ar' | 'de' | 'el' | 'en' | 'es' | 'fr' | 'ja' | 'kk' | 'no' | 'pt-BR' | 'ru' | 'vi' | 'zh';
 
 export interface Controller {
   initialize: (init: Initialize, callback: InitializeCallback) => void;

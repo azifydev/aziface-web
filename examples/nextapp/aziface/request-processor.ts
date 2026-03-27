@@ -2,15 +2,13 @@ import {
   FaceTecSessionRequestProcessorCallback,
   FaceTecSessionResult,
   FaceTecSessionStatus,
-} from '@/public/core/facetec/FaceTecPublicApi';
+} from '@/aziface/types/FaceTecPublicApi';
 import { FaceTecTestingAPINetworkingRequest } from './networking-request';
 
 export class SessionRequestProcessor {
   public requestCallback!: FaceTecSessionRequestProcessorCallback;
   // Save the onCompleteCallback
-  public onCompleteCallback: (
-    faceTecSessionStatus: FaceTecSessionStatus,
-  ) => void;
+  public onCompleteCallback: (faceTecSessionStatus: FaceTecSessionStatus) => void;
   public onOfficialIDPhotoCallback?: (image: string) => void;
   // ** Important Note: **
   // The API parameter demonstrationExternalDatabaseRefID is developer-defined and created and set by you using your own business logic.
@@ -28,17 +26,13 @@ export class SessionRequestProcessor {
     onCompleteCallback: (faceTecSessionStatus: FaceTecSessionStatus) => void,
     onOfficialIDPhotoCallback?: (image: string) => void,
   ) {
-    this.demonstrationExternalDatabaseRefID =
-      demonstrationExternalDatabaseRefID;
+    this.demonstrationExternalDatabaseRefID = demonstrationExternalDatabaseRefID;
     this.onCompleteCallback = onCompleteCallback;
     this.onOfficialIDPhotoCallback = onOfficialIDPhotoCallback;
   }
 
   // This method gets called from inside the FaceTecSDK when some server side process is needed to continue processing
-  public onSessionRequest = (
-    requestBlob: string,
-    requestCallback: FaceTecSessionRequestProcessorCallback,
-  ): void => {
+  public onSessionRequest = (requestBlob: string, requestCallback: FaceTecSessionRequestProcessorCallback): void => {
     // Create the simple payload to send to the networking class
     const sessionRequestProcessorPayload: {
       requestBlob: string;
@@ -50,10 +44,7 @@ export class SessionRequestProcessor {
 
     // Here you will call your implementation of networking that communicates through your middleware that contacts your server code
     // Send the payload to the FaceTecTestingAPI for processing
-    new FaceTecTestingAPINetworkingRequest().send(
-      sessionRequestProcessorPayload,
-      requestCallback,
-    );
+    new FaceTecTestingAPINetworkingRequest().send(sessionRequestProcessorPayload, requestCallback);
   };
 
   // Session is completely done
