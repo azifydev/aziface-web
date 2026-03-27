@@ -1,52 +1,174 @@
 'use client';
 
-import { Controller } from '@/aziface';
+import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { useBiometricConfigs } from '@/services';
-import { useUser } from './hooks';
+import { useUser } from '@/hooks';
+import {
+  authenticate,
+  dispose,
+  enroll,
+  initialize,
+  liveness,
+  photoMatch,
+  photoScan,
+  setLocale,
+  SessionError,
+  InitializeParams,
+  InitializeHeaders,
+  Locale,
+} from '@/aziface';
+import { FaceType } from '@/types/services.types';
+import { LOCALES } from '@/constants';
+import '@/aziface/aziface.css';
 
-export default function HomePage() {
-  const controller = new Controller();
+export function Home() {
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [i18n, setI18n] = useState<Locale>('en');
+
   const { data: configs } = useBiometricConfigs();
   const { tokenBiometric, logout } = useUser();
-  const handleInitialize = () => {
+
+  const onInitialize = (): void => {
+    const params: InitializeParams = {
+      baseUrl: process.env.NEXT_PUBLIC_API_URL_AZTECH || '',
+      deviceKeyIdentifier: configs?.device || '',
+      isDevelopment: true,
+    };
+
+    const headers: InitializeHeaders = {
+      'x-token-bearer': tokenBiometric || '',
+      'x-only-raw-analysis': '1',
+    };
+
+    initialize({ params, headers }, initialized => {
+      const error = initialized.error;
+
+      setIsInitialized(initialized.isSuccess);
+      if (error) {
+        toast.error(`(${error.code}) - ${error.cause}`);
+      } else {
+        setLocale(i18n);
+      }
+    });
+  };
+
+  const onDispose = (): void => {
+    dispose(disposed => {
+      setIsInitialized(!disposed);
+
+      if (!disposed) {
+        toast.error('Failed to dispose SDK.');
+      }
+    });
+  };
+
+  const onLocale = async (): Promise<void> => {
+    const locales = LOCALES.filter(loc => loc !== i18n);
+    const newLocale = locales[Math.floor(Math.random() * locales.length)];
+
+    setI18n(newLocale);
+    await setLocale(newLocale);
+  };
+
+  const onFaceScan = (type: FaceType): void => {
     try {
-      const initialized = controller.initialize({
-        params: { baseUrl: process.env.NEXT_PUBLIC_API_URL_AZTECH || '', deviceKeyIdentifier: configs?.device || '' },
-        headers: { 'x-token-bearer': tokenBiometric, 'x-only-raw-analysis': '1' },
-      });
-      console.log('isInitialized', initialized);
+      switch (type) {
+        case 'enroll':
+          enroll();
+          break;
+        case 'authenticate':
+          authenticate();
+          break;
+        case 'liveness':
+          liveness();
+          break;
+        case 'photoMatch':
+          photoMatch();
+          break;
+        case 'photoScan':
+          photoScan();
+          break;
+        default:
+          toast.error(`Invalid face scan type: ${type}`);
+          break;
+      }
     } catch (error) {
-      console.error('Initialize', error);
+      const sessionError = error as SessionError;
+      toast.error(sessionError.message);
     }
   };
-  const handleEnroll = async () => controller.enroll();
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
-      <div className='bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm shadow-sm'>
+      <Toaster position='bottom-right' />
+
+      <div className='w-full p-5 sm:bg-white sm:border sm:border-gray-200 sm:rounded-xl sm:p-8 sm:max-w-sm sm:shadow-sm'>
         <h1 className='text-2xl font-semibold text-gray-900 mb-1'>Home</h1>
         <p className='text-sm text-gray-500 mb-6'>Selecione uma ação</p>
 
         <div className='flex flex-col gap-3'>
           <button
-            onClick={handleInitialize}
+            onClick={onInitialize}
             className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Initialize
           </button>
 
           <button
-            onClick={handleEnroll}
-            className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+            onClick={() => onFaceScan('enroll')}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Enroll
           </button>
 
           <button
-            onClick={() => console.log('Liveness')}
-            className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+            onClick={() => onFaceScan('liveness')}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
           >
             Liveness
+          </button>
+
+          <button
+            onClick={() => onFaceScan('authenticate')}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Authenticate
+          </button>
+
+          <button
+            onClick={() => onFaceScan('photoMatch')}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Photo Match
+          </button>
+
+          <button
+            onClick={() => onFaceScan('photoScan')}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Photo Scan
+          </button>
+
+          <button
+            onClick={onLocale}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Locale: {i18n}
+          </button>
+
+          <button
+            onClick={onDispose}
+            disabled={!isInitialized}
+            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
+          >
+            Dispose
           </button>
 
           <button

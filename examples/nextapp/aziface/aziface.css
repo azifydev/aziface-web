@@ -1,0 +1,13 @@
+#DOM_FT_PRIMARY_TOPLEVEL_mainContainer
+  > #DOM_FT_overlayContainer
+  > #DOM_FT_idScanDesktopSubframeInterfaceContainer
+  > #DOM_FT_idScanButtonContainer {
+  border: none !important;
+}
+
+#DOM_FT_PRIMARY_TOPLEVEL_mainContainer
+  > #DOM_FT_orientationContainer
+  > #DOM_FT_orientationContentContainer
+  > #DOM_FT_orientationImageContainer {
+  margin: 0 auto !important;
+}

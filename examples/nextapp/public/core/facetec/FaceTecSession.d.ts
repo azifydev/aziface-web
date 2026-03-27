@@ -1,11 +1,11 @@
-import { FaceTecSDKInstance, FaceTecProcessor } from './FaceTecPublicApi';
+import { FaceTecSDKInstance, FaceTecSessionRequestProcessor } from "./FaceTecPublicApi";
 export declare class FaceTecSDKInstanceImpl implements FaceTecSDKInstance {
-  start3DLiveness(Processor: FaceTecProcessor): void;
-  start3DLivenessThen3DFaceMatch(Processor: FaceTecProcessor): void;
-  startIDScanOnly(Processor: FaceTecProcessor): void;
-  startIDScanThen3D2DMatch(Processor: FaceTecProcessor): void;
-  start3DLivenessThen3D2DPhotoIDMatch(Processor: FaceTecProcessor): void;
-  startSecureOfficialIDPhotoCapture(Processor: FaceTecProcessor): void;
-  private static startSession;
+    start3DLiveness(sessionRequestProcessor: FaceTecSessionRequestProcessor): void;
+    start3DLivenessThen3DFaceMatch(sessionRequestProcessor: FaceTecSessionRequestProcessor): void;
+    startIDScanOnly(sessionRequestProcessor: FaceTecSessionRequestProcessor): void;
+    startIDScanThen3D2DMatch(sessionRequestProcessor: FaceTecSessionRequestProcessor): void;
+    start3DLivenessThen3D2DPhotoIDMatch(sessionRequestProcessor: FaceTecSessionRequestProcessor): void;
+    startSecureOfficialIDPhotoCapture(sessionRequestProcessor: FaceTecSessionRequestProcessor): void;
+    private static startSession;
 }
 //# sourceMappingURL=FaceTecSession.d.ts.map

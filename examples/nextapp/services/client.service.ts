@@ -1,7 +1,12 @@
-import { ConfigsResponseData, CreateUserRequest, LoginRequest, LoginResponse } from '@/types/services.types';
+import {
+  ConfigsResponseData,
+  CreateUserRequest,
+  LoginRequest,
+  LoginResponse,
+} from '@/types/services.types';
 import { clientApi } from './api';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useUserStore } from '@/app/hooks';
+import { useUserStore } from '@/hooks';
 
 export function useCreate() {
   return useMutation({
@@ -14,6 +19,7 @@ export function useCreate() {
     },
   });
 }
+
 export function useLogin() {
   return useMutation({
     mutationKey: ['login'],
@@ -47,7 +53,9 @@ export function useBiometricConfigs() {
   return useQuery({
     queryKey: ['configs'],
     queryFn: async () => {
-      const response = await clientApi.get<ConfigsResponseData>('/biometrics/configs');
+      const response = await clientApi.get<ConfigsResponseData>(
+        '/biometrics/configs',
+      );
 
       return response.data;
     },
