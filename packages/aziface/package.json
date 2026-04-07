@@ -10,8 +10,5 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist"
-  },
-  "devDependencies": {
-    "@types/node": "^25.5.0"
   }
 }

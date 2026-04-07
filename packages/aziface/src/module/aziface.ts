@@ -26,12 +26,11 @@ export class AzifaceController implements Controller {
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
-  private static assetsUrl: string = process.env.AZIFACE_ASSETS_URL || '';
   public initialize = (init: Initialize, callback: InitializeCallback): void => {
     this.setupController(init);
 
-    FaceTecSDK.setImagesDirectory(`${AzifaceController.assetsUrl}/core/images`);
-    FaceTecSDK.setResourceDirectory(`${AzifaceController.assetsUrl}/core/facetec/resources`);
+    FaceTecSDK.setImagesDirectory(`/core/images`);
+    FaceTecSDK.setResourceDirectory(`/core/facetec/resources`);
 
     applyTheme();
 
