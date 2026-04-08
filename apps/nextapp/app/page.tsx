@@ -14,11 +14,7 @@ export default function Page() {
   const isAuth = !!token && !!tokenBiometric;
   return (
     <QueryClientProvider client={queryClient}>
-      <Script
-        src={`${process.env.NEXT_PUBLIC_AZIFACE_ASSETS_URL}/core/facetec/FaceTecSDK.js`}
-        strategy='beforeInteractive'
-      />
-
+      <Script src={`/core/facetec/FaceTecSDK.js`} strategy='beforeInteractive' />
       <When condition={isAuth}>
         <Home />
       </When>

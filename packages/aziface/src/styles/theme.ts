@@ -4,7 +4,7 @@ import { Style } from '../types/aziface';
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
 function retrieveConfigurationWizardCustomization(theme?: Style) {
-  const sdkImageDirectory = `${process.env.AZIFACE_ASSETS_URL}/core/images/`;
+  const sdkImageDirectory = `/core/images/`;
   // For Color Customization
   const outerBackgroundColor = theme?.backgroundColor || '#FFFFFF';
   const frameColor = theme?.frameColor || '#FFFFFF';

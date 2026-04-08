@@ -41,6 +41,17 @@ Web SDK adapter for React.
 
 <hr/>
 
+## Adding the SDK assets to your project
+
+1. Go to your project’s `public` directory and copy the `core` folder from the SDK package example into it. This folder includes all the essential assets required for the SDK to function correctly, such as images and other resources.
+
+2. Include the following script in your layout page when using a Next.js app, or in the main entry point of your application if you are using a different framework:
+
+```tsx
+<Script src='/core/facetec/FaceTecSDK.js' strategy='beforeInteractive' />
+//Others: <script src="/core/facetec/FaceTecSDK.js"></script>
+```
+
 ## Installation
 
 Add the SDK to your project:
@@ -86,7 +97,7 @@ export function MyPage() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, initialized => {
+    initialize({ params, headers }, (initialized) => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
@@ -97,7 +108,7 @@ export function MyPage() {
   };
 
   const onDispose = (): void => {
-    dispose(disposed => {
+    dispose((disposed) => {
       setIsInitialized(!disposed);
 
       if (!disposed) {
@@ -240,7 +251,7 @@ initialize(
       'x-only-raw-analysis': '1',
     },
   },
-  initialized => {
+  (initialized) => {
     const error = initialized.error;
 
     if (error) {
@@ -270,7 +281,7 @@ Dispose is typically used when the application is terminating, when the SDK will
 If dispose is performed while a session is still in progress, the SDK may return an error or forcefully terminate the session, depending on the platform implementation.
 
 ```ts
-dispose(disposed => {
+dispose((disposed) => {
   if (disposed) {
     console.log('SDK disposed with successful!!!');
   } else {
@@ -334,7 +345,7 @@ initialize(
   {
     // ...
   },
-  initialized => {
+  (initialized) => {
     const error = initialized.error;
 
     if (error && !initialized.isSuccess) {
@@ -369,7 +380,7 @@ initialize(
   {
     // ...
   },
-  initialized => {
+  (initialized) => {
     if (initialized.error && !initialized.isSuccess) {
       // ...
     } else {
@@ -401,7 +412,7 @@ initialize(
   {
     // ...
   },
-  initialized => {
+  (initialized) => {
     if (initialized.error && !initialized.isSuccess) {
       // ...
     } else {
