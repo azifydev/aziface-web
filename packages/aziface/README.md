@@ -43,7 +43,14 @@ Web SDK adapter for React.
 
 ## Adding the SDK assets to your project
 
-Go to your project’s `public` directory and copy the `core` folder from the SDK package example into it. This folder includes all the essential assets required for the SDK to function correctly, such as images and other resources.
+1. Go to your project’s `public` directory and copy the `core` folder from the SDK package example into it. This folder includes all the essential assets required for the SDK to function correctly, such as images and other resources.
+
+2. Include the following script in your layout page when using a Next.js app, or in the main entry point of your application if you are using a different framework:
+
+```tsx
+<Script src='/core/facetec/FaceTecSDK.js' strategy='beforeInteractive' />
+//Others: <script src="/core/facetec/FaceTecSDK.js"></script>
+```
 
 ## Installation
 
