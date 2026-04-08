@@ -19,8 +19,8 @@
     "url": "git+https://github.com/azifydev/aziface-web.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+   "author": "Azify (https://github.com/azifydev)",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/azifydev/aziface-web/issues"
