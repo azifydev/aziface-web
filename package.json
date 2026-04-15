@@ -4,14 +4,12 @@
   "description": "Web SDK adapter for React.",
   "main": "index.js",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:packages": "npm run build --workspace=packages --if-present",
-    "build:apps": "npm run build --workspace=apps --if-present",
-    "build": "npm run build:packages && npm run build:apps",
+    "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspaces --if-present",
     "release": "cd packages/aziface && npm run build && npx semantic-release",
     "clean": "npm run clean --workspaces --if-present"
