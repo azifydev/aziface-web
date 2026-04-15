@@ -1,6 +1,6 @@
 # @azify/aziface-web 🖥️
 
-Web SDK adapter for React.
+Web SDK adapter.
 
 ## Summary
 
