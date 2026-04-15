@@ -1,6 +1,7 @@
 {
+ "$schema": "./node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
   "name": "aziface-web",
   "compatibility_date": "2026-04-15",
-  "main": "./src/index.ts",
   "compatibility_flags": ["nodejs_compat"]
 }
