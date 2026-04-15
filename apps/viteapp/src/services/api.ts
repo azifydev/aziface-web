@@ -1,6 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import toast from 'react-hot-toast';
 import { useUserStore } from '../hooks';
 
 export const clientBaseURL = import.meta.env.VITE_PUBLIC_API_CLIENT_API;
