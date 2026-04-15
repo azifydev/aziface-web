@@ -27,6 +27,6 @@
     "eslint-config-next": "16.1.7",
     "tailwindcss": "^4",
     "typescript": "5",
-    "@azify/aziface-web": "1.0.7"
+    "@azify/aziface-web": "*"
   }
 }
