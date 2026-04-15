@@ -9,8 +9,8 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN_V2 }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN_V2 }}
       AZIFACE_ASSETS_URL: ${{ secrets.AZIFACE_ASSETS_URL }}
 
     steps:
