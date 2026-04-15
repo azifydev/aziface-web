@@ -10,5 +10,9 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist"
+  },
+    "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   }
 }
