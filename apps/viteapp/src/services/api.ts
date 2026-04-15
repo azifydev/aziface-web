@@ -20,7 +20,7 @@ clientApi.interceptors.request.use(
     }
     config.validateStatus = (status) => {
       if (status === 401) {
-        toast.error('Session expired. Please log in again.');
+        alert('Session expired. Please log in again.');
         useUserStore.getState().logout();
         return false;
       }
