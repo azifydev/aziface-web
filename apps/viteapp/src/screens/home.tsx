@@ -30,7 +30,7 @@ export function Home() {
     const params: InitializeParams = {
       baseUrl: import.meta.env.VITE_PUBLIC_API_URL_AZTECH || '',
       deviceKeyIdentifier: configs?.device || '',
-      isDevelopment: true,
+      isDevelopment: false,
     };
 
     const headers: InitializeHeaders = {
