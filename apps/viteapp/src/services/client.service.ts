@@ -1,4 +1,9 @@
-import type { ConfigsResponseData, CreateUserRequest, LoginRequest, LoginResponse } from '../types/services.types';
+import type {
+  ConfigsResponseData,
+  CreateUserRequest,
+  LoginRequest,
+  LoginResponse,
+} from '../types/services.types';
 import { clientApi } from './api';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useUserStore } from '../hooks';
@@ -48,7 +53,9 @@ export function useBiometricConfigs() {
   return useQuery({
     queryKey: ['configs'],
     queryFn: async () => {
-      const response = await clientApi.get<ConfigsResponseData>('/biometrics/configs');
+      const response = await clientApi.get<ConfigsResponseData>(
+        '/biometrics/configs',
+      );
 
       return response.data;
     },

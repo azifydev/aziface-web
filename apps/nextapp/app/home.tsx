@@ -41,7 +41,7 @@ export function Home() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, (initialized) => {
+    initialize({ params, headers }, initialized => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
@@ -54,7 +54,7 @@ export function Home() {
   };
 
   const onDispose = (): void => {
-    dispose((disposed) => {
+    dispose(disposed => {
       setIsInitialized(!disposed);
 
       if (!disposed) {
@@ -63,31 +63,31 @@ export function Home() {
     });
   };
 
-  const onLocale = async (): Promise<void> => {
-    const locales = LOCALES.filter((loc) => loc !== i18n);
+  const onLocale = (): void => {
+    const locales = LOCALES.filter(loc => loc !== i18n);
     const newLocale = locales[Math.floor(Math.random() * locales.length)];
 
     setI18n(newLocale);
-    await setLocale(newLocale);
+    setLocale(newLocale);
   };
 
-  const onFaceScan = (type: FaceType): void => {
+  const onFaceScan = async (type: FaceType): Promise<void> => {
     try {
       switch (type) {
         case 'enroll':
-          enroll();
+          await enroll();
           break;
         case 'authenticate':
-          authenticate();
+          await authenticate();
           break;
         case 'liveness':
-          liveness();
+          await liveness();
           break;
         case 'photoMatch':
-          photoMatch();
+          await photoMatch();
           break;
         case 'photoScan':
-          photoScan();
+          await photoScan();
           break;
         default:
           toast.error(`Invalid face scan type: ${type}`);

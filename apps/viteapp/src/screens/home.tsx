@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { useBiometricConfigs } from '../services';
 import { useUser } from '../hooks';
 import {
@@ -38,12 +39,12 @@ export function Home() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, (initialized) => {
+    initialize({ params, headers }, initialized => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
       if (error) {
-        alert(`(${error.code}) - ${error.cause}`);
+        toast.error(`(${error.code}) - ${error.cause}`);
       } else {
         setLocale(i18n);
       }
@@ -51,53 +52,55 @@ export function Home() {
   };
 
   const onDispose = (): void => {
-    dispose((disposed) => {
+    dispose(disposed => {
       setIsInitialized(!disposed);
 
       if (!disposed) {
-        alert('Failed to dispose SDK.');
+        toast.error('Failed to dispose SDK.');
       }
     });
   };
 
-  const onLocale = async (): Promise<void> => {
-    const locales = LOCALES.filter((loc) => loc !== i18n);
+  const onLocale = (): void => {
+    const locales = LOCALES.filter(loc => loc !== i18n);
     const newLocale = locales[Math.floor(Math.random() * locales.length)];
 
     setI18n(newLocale);
-    await setLocale(newLocale);
+    setLocale(newLocale);
   };
 
-  const onFaceScan = (type: FaceType): void => {
+  const onFaceScan = async (type: FaceType): Promise<void> => {
     try {
       switch (type) {
         case 'enroll':
-          enroll();
+          await enroll();
           break;
         case 'authenticate':
-          authenticate();
+          await authenticate();
           break;
         case 'liveness':
-          liveness();
+          await liveness();
           break;
         case 'photoMatch':
-          photoMatch();
+          await photoMatch();
           break;
         case 'photoScan':
-          photoScan();
+          await photoScan();
           break;
         default:
-          alert(`Invalid face scan type: ${type}`);
+          toast.error(`Invalid face scan type: ${type}`);
           break;
       }
     } catch (error) {
       const sessionError = error as SessionError;
-      alert(sessionError.message);
+      toast.error(sessionError.message);
     }
   };
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+      <Toaster position='bottom-right' />
+
       <div className='w-full p-5 sm:bg-white sm:border sm:border-gray-200 sm:rounded-xl sm:p-8 sm:max-w-sm sm:shadow-sm'>
         <h1 className='text-2xl font-semibold text-gray-900 mb-1'>Home</h1>
         <p className='text-sm text-gray-500 mb-6'>Selecione uma ação</p>

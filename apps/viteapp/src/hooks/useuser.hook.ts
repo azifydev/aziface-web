@@ -11,7 +11,7 @@ interface UseUserProps {
 
 export const useUserStore = create<UseUserProps>()(
   persist(
-    (set) => ({
+    set => ({
       token: '',
       tokenBiometric: '',
       setToken: (token: string) => {

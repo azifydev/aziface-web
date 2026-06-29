@@ -13,12 +13,12 @@ export const clientApi = axios.create({
 });
 
 clientApi.interceptors.request.use(
-  async (config) => {
+  async config => {
     const token = useUserStore.getState()?.token || '';
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    config.validateStatus = (status) => {
+    config.validateStatus = status => {
       if (status === 401) {
         alert('Session expired. Please log in again.');
         useUserStore.getState().logout();
@@ -28,12 +28,12 @@ clientApi.interceptors.request.use(
     };
     return config;
   },
-  (error) => Promise.reject(error),
+  error => Promise.reject(error),
 );
 
 clientApi.interceptors.response.use(
-  (res) => res,
-  (error) => Promise.reject(error),
+  res => res,
+  error => Promise.reject(error),
 );
 export const queryClient = new QueryClient({
   defaultOptions: {

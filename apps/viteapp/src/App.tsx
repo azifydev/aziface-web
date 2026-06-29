@@ -4,6 +4,7 @@ import { useUser } from './hooks';
 import { Unless, When } from 'react-if';
 import { Home } from './screens/home';
 import { Login } from './screens/login';
+
 function App() {
   const { tokenBiometric, token } = useUser();
   const isAuth = !!token && !!tokenBiometric;
@@ -18,4 +19,5 @@ function App() {
     </QueryClientProvider>
   );
 }
+
 export default App;
