@@ -4,6 +4,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   release:
     name: Release
@@ -11,11 +15,12 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN_V2 }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN_V2 }}
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_V2 }}
       AZIFACE_ASSETS_URL: ${{ secrets.AZIFACE_ASSETS_URL }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -24,11 +29,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: https://registry.npmjs.org
+          scope: '@azify'
 
       - name: Install dependencies
-        run: |
-          npm set //registry.npmjs.org/:_authToken $NPM_TOKEN
-          npm ci
+        run: npm ci
 
       - name: Semantic Release
         run: npm run release
