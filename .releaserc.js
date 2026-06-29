@@ -35,10 +35,10 @@ module.exports = {
     ],
     '@semantic-release/github',
     [
-      '@semantic-release/git',
+      '@semantic-release/exec',
       {
-        assets: [`${pkgRoot}/package.json`, `${pkgRoot}/CHANGELOG.md`],
-        message: 'chore(release): ${nextRelease.version} [skip ci]',
+        successCmd:
+          'git add packages/aziface/package.json packages/aziface/CHANGELOG.md && git diff --staged --quiet || (git commit -m "chore(release): ${nextRelease.version} [skip ci]" && git push origin HEAD:refs/heads/main)',
       },
     ],
   ],

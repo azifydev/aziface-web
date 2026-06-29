@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: write
   id-token: write
@@ -13,6 +17,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN_V2 }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN_V2 }}
@@ -28,7 +33,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
           persist-credentials: false
+
+      - name: Sync with remote
+        run: git pull --ff-only origin main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
