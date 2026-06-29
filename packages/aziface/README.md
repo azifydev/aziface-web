@@ -1,10 +1,14 @@
-# @azify/aziface-web 🖥️
+# @azify/aziface-web
 
-Web SDK adapter for React.
+[![npm version](https://img.shields.io/npm/v/@azify/aziface-web.svg)](https://www.npmjs.com/package/@azify/aziface-web)
+
+Web SDK adapter for React — face enrollment, authentication, liveness, and document verification powered by FaceTec.
 
 ## Summary
 
+- [Requirements](#requirements)
 - [Installation](#installation)
+- [Static assets](#static-assets)
 - [Setup](#setup)
   - [Next.js](#nextjs)
   - [Vite](#vite)
@@ -46,13 +50,35 @@ Web SDK adapter for React.
 
 <hr/>
 
-## Installation
+## Requirements
 
-Add the SDK to your project:
+- **React** 18 or 19
+- **HTTPS** or **localhost** — camera APIs are blocked on remote HTTP ([`GetUserMediaRemoteHTTPNotSupported`](#initializecodeerror))
+- **FaceTec static assets** hosted by your application (not bundled in the npm package)
+- Valid Aziface credentials: `deviceKeyIdentifier`, `baseUrl`, and `x-token-bearer`
+
+## Installation
 
 ```bash
 npm i @azify/aziface-web
 ```
+
+## Static assets
+
+The SDK expects FaceTec resources to be available at runtime. Host the following paths in your app's public directory:
+
+| Path | Purpose |
+| --- | --- |
+| `/core/facetec/FaceTecSDK.js` | FaceTec browser SDK (loaded via `<script>`) |
+| `/core/facetec/resources/` | FaceTec resource bundle |
+| `/core/images/` | Branding and cancel button images (optional; used by `withTheme`) |
+
+Reference implementations live in this monorepo:
+
+- [Next.js demo](../../apps/nextapp)
+- [Vite demo](../../apps/viteapp)
+
+> Obtain FaceTec asset files from your Azify integration contact. They are not included in the npm package.
 
 <hr/>
 
@@ -106,6 +132,21 @@ In your `index.html`, add the following script:
 ```
 
 Your Vite environment is now configured!
+
+<hr/>
+
+## Lifecycle
+
+Typical integration flow:
+
+1. Load `FaceTecSDK.js` in the page (see [Setup](#setup))
+2. Import SDK methods and styles (`@azify/aziface-web/dist/aziface.css`)
+3. Call `initialize()` once with credentials and headers
+4. Optionally call `setLocale()` and `withTheme()` after a successful init
+5. Run session methods: `enroll`, `authenticate`, `liveness`, `photoScan`, or `photoMatch`
+6. Call `dispose()` when the SDK is no longer needed
+
+Session methods throw [`SessionError`](#sessionerror) on failure — always wrap them in `try/catch`.
 
 <hr/>
 
@@ -676,3 +717,15 @@ The `constructor` receives `code` as an argument.
 | Property | Type                          | Required |
 | -------- | ----------------------------- | -------- |
 | `code`   | [`SessionCode`](#sessioncode) | ✅       |
+
+<hr/>
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
+
+<hr/>
+
+## License
+
+MIT

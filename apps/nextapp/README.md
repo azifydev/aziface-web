@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NextApp
 
-## Getting Started
+Next.js reference application for [`@azify/aziface-web`](../../packages/aziface).
 
-First, run the development server:
+Use this app to validate SDK changes in a Next.js environment before publishing.
+
+## Requirements
+
+- Node.js 22+
+- FaceTec assets under `public/core/` (see [SDK static assets](../../packages/aziface/README.md#static-assets))
+## Environment variables
+
+| Variable | App | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL_AZTECH` | NextApp | Aziface API base URL |
+| `NEXT_PUBLIC_API_CLIENT_API` | NextApp | Client API base URL |
+| `NEXT_PUBLIC_X_API_KEY` | NextApp | API key header |
+
+Create a `.env.local` file in this directory with the values above (ask the team for staging credentials).
+
+## Scripts
+
+From the **repository root**:
+
+```bash
+npm run next:dev      # http://localhost:3000
+npm run next:build    # production build
+```
+
+From this directory:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Path | Description |
+| --- | --- |
+| `app/` | Next.js App Router pages (`login`, `home`) |
+| `public/core/facetec/` | FaceTec SDK script and resources |
+| `public/core/images/` | Theme images for `withTheme` |
+| `services/` | API client and biometric config hooks |
+| `stores/` | Zustand state |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## SDK integration
 
-## Learn More
+The FaceTec script is loaded in `app/page.tsx`:
 
-To learn more about Next.js, take a look at the following resources:
+```tsx
+<Script src="/core/facetec/FaceTecSDK.js" strategy="beforeInteractive" />
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Biometric flows are implemented in `app/home.tsx` using `@azify/aziface-web`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentation
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [SDK API & types](../../packages/aziface/README.md)
+- [Monorepo guide](../../README.md)
