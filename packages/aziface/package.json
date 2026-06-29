@@ -1,11 +1,13 @@
 {
   "name": "@azify/aziface-web",
-  "version": "1.0.8",
+  "version": "1.0.11",
   "description": "Web SDK adapter.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist/**"],
+  "files": [
+    "dist/**"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azifydev/aziface-web.git",
