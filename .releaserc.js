@@ -1,5 +1,8 @@
+const pkgRoot = 'packages/aziface';
+
 module.exports = {
   branches: ['main'],
+  tagFormat: 'v${version}',
   plugins: [
     [
       '@semantic-release/commit-analyzer',
@@ -17,13 +20,25 @@ module.exports = {
       },
     ],
     '@semantic-release/release-notes-generator',
-    '@semantic-release/changelog',
+    [
+      '@semantic-release/changelog',
+      {
+        changelogFile: `${pkgRoot}/CHANGELOG.md`,
+      },
+    ],
+    [
+      '@semantic-release/npm',
+      {
+        pkgRoot,
+        npmPublish: true,
+      },
+    ],
     '@semantic-release/github',
-    '@semantic-release/npm',
     [
       '@semantic-release/git',
       {
-        assets: ['package.json', 'CHANGELOG.md'],
+        assets: [`${pkgRoot}/package.json`, `${pkgRoot}/CHANGELOG.md`],
+        message: 'chore(release): ${nextRelease.version} [skip ci]',
       },
     ],
   ],

@@ -1,17 +1,22 @@
 {
   "name": "@azify/aziface-web",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Web SDK adapter.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": ["dist/**"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/azifydev/aziface-web.git",
+    "directory": "packages/aziface"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist"
   },
-    "publishConfig": {
+  "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   }
