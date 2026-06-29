@@ -5,6 +5,9 @@ Web SDK adapter for React.
 ## Summary
 
 - [Installation](#installation)
+- [Setup](#setup)
+  - [Next.js](#nextjs)
+  - [Vite](#vite)
 - [Usage](#usage)
 - [API](#api)
   - [`initialize`](#initialize)
@@ -23,6 +26,7 @@ Web SDK adapter for React.
   - [`resetTheme`](#resettheme)
   - [`setLocale`](#setlocale)
     - [`Properties`](#properties-3)
+- [Styles](#styles)
 - [Types](#types)
   - [`Initialize`](#initialize-1)
     - [`InitializeParams`](#initializeparams)
@@ -34,6 +38,7 @@ Web SDK adapter for React.
   - [`DisposeCallback`](#disposecallback)
   - [`SessionCode`](#sessioncode)
   - [`Style`](#style)
+    - [`CancelLocation`](#cancellocation)
   - [`Locale`](#locale)
 - [Classes](#classes)
   - [`SessionError`](#sessionerror)
@@ -51,6 +56,59 @@ npm i @azify/aziface-web
 
 <hr/>
 
+## Setup
+
+Add the configuration below according to the environment you are using:
+
+### Next.js
+
+In your `app/page.tsx`, add the following script:
+
+```tsx
+'use client';
+
+import Script from 'next/script';
+// ...
+
+export default function Page() {
+  // ...
+
+  return (
+    <>
+      <Script
+        src={`/core/facetec/FaceTecSDK.js`}
+        strategy='beforeInteractive'
+      />
+
+      {/* ... */}
+    </>
+  );
+}
+```
+
+Your Next.js environment is now configured!
+
+### Vite
+
+In your `index.html`, add the following script:
+
+```html
+<!doctype html>
+<html lang="en">
+  <!-- ... -->
+  <body>
+    <div id="root"></div>
+    <!-- Add this line -->
+    <script src="/core/facetec/FaceTecSDK.js"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+```
+
+Your Vite environment is now configured!
+
+<hr/>
+
 ## Usage
 
 ```tsx
@@ -63,12 +121,14 @@ import {
   liveness,
   photoMatch,
   photoScan,
+  setLocale,
   withTheme,
+  SessionError,
   type Initialize,
-  type InitializeCallback,
   type InitializeHeaders,
   type InitializeParams,
 } from '@azify/aziface-web';
+import '@azify/aziface-web/dist/aziface.css';
 
 export function MyPage() {
   // ...
@@ -92,6 +152,8 @@ export function MyPage() {
       setIsInitialized(initialized.isSuccess);
       if (error) {
         console.error(`${error.cause} - (${error.code})`);
+      } else {
+        setLocale('en');
       }
     });
   };
@@ -106,23 +168,23 @@ export function MyPage() {
     });
   };
 
-  const onFaceScan = (type: string): void => {
+  const onFaceScan = async (type: string): Promise<void> => {
     try {
       switch (type) {
         case 'enroll':
-          enroll();
+          await enroll();
           break;
         case 'authenticate':
-          authenticate();
+          await authenticate();
           break;
         case 'liveness':
-          liveness();
+          await liveness();
           break;
         case 'photoMatch':
-          photoMatch();
+          await photoMatch();
           break;
         case 'photoScan':
-          photoScan();
+          await photoScan();
           break;
         default:
           console.error(`Invalid face scan type: ${type}`);
@@ -204,26 +266,26 @@ export function MyPage() {
 
 ## API
 
-| Methods        | Return type |
-| -------------- | ----------- |
-| `initialize`   | `void`      |
-| `dispose`      | `void`      |
-| `enroll`       | `void`      |
-| `authenticate` | `void`      |
-| `liveness`     | `void`      |
-| `photoScan`    | `void`      |
-| `photoMatch`   | `void`      |
-| `withTheme`    | `void`      |
-| `resetTheme`   | `void`      |
-| `setLocale`    | `void`      |
+| Methods        | Return type        |
+| -------------- | ------------------ |
+| `initialize`   | `void`             |
+| `dispose`      | `void`             |
+| `enroll`       | `Promise<boolean>` |
+| `authenticate` | `Promise<boolean>` |
+| `liveness`     | `Promise<boolean>` |
+| `photoScan`    | `Promise<boolean>` |
+| `photoMatch`   | `Promise<boolean>` |
+| `withTheme`    | `void`             |
+| `resetTheme`   | `void`             |
+| `setLocale`    | `void`             |
 
 ### `initialize`
 
-The `initialize` of the Aziface SDK is the process of configuring and preparing the SDK for use before any face capture, liveness, authentication, or identity verification sessions can begin.
+The `initialize` method configures and prepares the Aziface SDK before any face capture, liveness, authentication, or identity verification session can begin.
 
 During initialization, the application provides the SDK with the required configuration data, such as the device key identifier, base URL, and `x-token-bearer`. The SDK validates these parameters, performs internal setup, and prepares the necessary resources for secure camera access, biometric processing, and user interface rendering.
 
-A successful initialization confirms that the SDK is correctly licensed, properly configured for the target environment, and ready to start user sessions. If initialization fails due to invalid keys, network issues, or unsupported device conditions, the SDK returns boolean information (true or false) so the application can handle the failure gracefully and prevent session startup.
+A successful initialization confirms that the SDK is correctly licensed, properly configured for the target environment, and ready to start user sessions. If initialization fails due to invalid keys, network issues, or unsupported device conditions, the SDK returns an `InitializeResponse` object with `isSuccess` and error details so the application can handle the failure gracefully and prevent session startup.
 
 Initialization is a mandatory step and must be completed once during the application lifecycle (or as required by the platform) before invoking any Aziface SDK workflows.
 
@@ -272,7 +334,7 @@ If dispose is performed while a session is still in progress, the SDK may return
 ```ts
 dispose(disposed => {
   if (disposed) {
-    console.log('SDK disposed with successful!!!');
+    console.log('SDK disposed successfully!');
   } else {
     console.error('Failed to dispose SDK.');
   }
@@ -295,7 +357,7 @@ The result of a successful enrollment is a trusted biometric template associated
 
 ### `authenticate`
 
-The authentication method in the Aziface SDK is used to verify a user’s identity by comparing a newly captured face scan against a previously enrolled biometric template. This process confirms that the person attempting to access the system is the same individual who completed the enrollment.
+The `authenticate` method verifies a user's identity by comparing a newly captured face scan against a previously enrolled biometric template. This process confirms that the person attempting to access the system is the same individual who completed enrollment.
 
 During authentication, the SDK performs an active liveness check while guiding the user through simple on-screen instructions. A fresh face scan is captured, encrypted, and securely transmitted to the backend, where it is matched against the stored enrollment data.
 
@@ -327,7 +389,7 @@ A successful document-only verification is suitable for lower-risk scenarios or 
 
 ### `withTheme`
 
-This method customize your SDK theme during session. The Aziface SDK must be successfully initialized **before calling** this API.
+This method customizes your SDK theme during a session. The Aziface SDK must be successfully initialized **before calling** this API.
 
 ```ts
 initialize(
@@ -358,7 +420,7 @@ initialize(
 
 The `brandingImage` and `cancelImage` properties represents your branding and icon of the button cancel. Default are [Azify](https://azify.com/) images, and `.png` format. If the image is not found, it will not be displayed during the session.
 
-You must go to your project's `public/core/images` directory. Inside the `public/core/images` folder, you must put your images.
+Go to your project's `public/core/images` directory and add your custom images there.
 
 ##### Example
 
@@ -382,9 +444,11 @@ initialize(
 );
 ```
 
+**Note**: Images via HTTPS link **aren't** supported by SDK.
+
 ### `resetTheme`
 
-The `resetTheme` is a fallback method to return default theme.
+The `resetTheme` method restores the default theme.
 
 ### `setLocale`
 
@@ -405,7 +469,7 @@ initialize(
     if (initialized.error && !initialized.isSuccess) {
       // ...
     } else {
-      setLocale('pt-br');
+      setLocale('pt-BR');
     }
   },
 );
@@ -416,6 +480,28 @@ initialize(
 | Property | Type                | Required | Default     |
 | -------- | ------------------- | -------- | ----------- |
 | `locale` | [`Locale`](#locale) | ✅       | `undefined` |
+
+<hr/>
+
+## Styles
+
+Aziface Web recommends importing our predefined styles for the best user experience.
+
+Simply import them onto the screen where you are using Aziface methods.
+
+```tsx
+// ...
+import {
+  authenticate,
+  dispose,
+  enroll,
+  initialize,
+  liveness,
+  photoMatch,
+  photoScan,
+} from '@azify/aziface-web';
+import '@azify/aziface-web/dist/aziface.css'; // <-- Add this import
+```
 
 <hr/>
 
@@ -432,7 +518,7 @@ The `Initialize` object is required to initialize the SDK.
 
 #### `InitializeParams`
 
-It initializes, and it starts SDK.
+It contains the parameters used to initialize and start the SDK.
 
 | Property              | Type      | Required |
 | --------------------- | --------- | -------- |
@@ -444,14 +530,14 @@ It initializes, and it starts SDK.
 
 It establishes communication between the SDK and the external service.
 
-| Property         | Type     | Required |
-| ---------------- | -------- | -------- |
-| `x-token-bearer` | `string` | ✅       |
-| `[key: string]`  | `string` | ❌       |
+| Property         | Type                          | Required |
+| ---------------- | ----------------------------- | -------- |
+| `x-token-bearer` | `string`                      | ✅       |
+| `[key: string]`  | `string \| null \| undefined` | ❌       |
 
 ### `InitializeCallback`
 
-Get initialization response using the `InitializeCallback`.
+Use `InitializeCallback` to receive the initialization response.
 
 | Callback      | Type                                        | Required |
 | ------------- | ------------------------------------------- | -------- |
@@ -496,19 +582,19 @@ The session code is a type identifier of the session when a method fails or it h
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
 | `SessionCompleted`                  | The Session was completed.                                                                                                                                   | `0`        |
 | `RequestAborted`                    | When session has catastrophic error and the application could not be validated.                                                                              | `1`        |
-| `UserCancelledFaceScan`             | The user cancelled before performing enough scans to cucceed.                                                                                                | `2`        |
+| `UserCancelledFaceScan`             | The user cancelled before performing enough scans to succeed.                                                                                                | `2`        |
 | `UserCancelledIDScan`               | The user cancelled before completing all of the steps in the ID Scan Process.                                                                                | `3`        |
 | `LockedOut`                         | The session was cancelled because the user was in a locked out state.                                                                                        | `4`        |
 | `CameraError`                       | The session was cancelled because Aziface SDK was unable to start the camera on this device, or an unexpected error occurred with the camera during runtime. | `5`        |
 | `CameraPermissionsDenied`           | The session was cancelled because camera permissions were not enabled.                                                                                       | `6`        |
 | `UnknownInternalError`              | An unknown and unexpected error occurred.                                                                                                                    | `7`        |
-| `IFrameNotAllowedWithoutPermission` | The session was cancelled, the Aziface SDK was opened in an Iframe without permission.                                                                       | `8`        |
+| `IFrameNotAllowedWithoutPermission` | The session was cancelled because the Aziface SDK was opened in an iframe without permission.                                                                | `8`        |
 | `NotInitialized`                    | This error code indicates that the Aziface SDK has not been initialized.                                                                                     | `9`        |
 | `NoUserEnrolled`                    | No user enrolled. Please enroll a user before attempting to authenticate.                                                                                    | `10`       |
 
 ### `DisposeCallback`
 
-Get dispose response using the `DisposeCallback`.
+Use `DisposeCallback` to receive the dispose response.
 
 | Callback   | Type      | Required |
 | ---------- | --------- | -------- |
@@ -518,21 +604,33 @@ Get dispose response using the `DisposeCallback`.
 
 Customize your Aziface SDK using `Style` object.
 
-| Property                        | Type     | Required | Default     |
-| ------------------------------- | -------- | -------- | ----------- |
-| `backgroundColor`               | `string` | ❌       | `#FFFFFF`   |
-| `frameColor`                    | `string` | ❌       | `#FFFFFF`   |
-| `borderColor`                   | `string` | ❌       | `#026FF4`   |
-| `ovalColor`                     | `string` | ❌       | `#026FF4`   |
-| `dualSpinnerColor`              | `string` | ❌       | `#026FF4`   |
-| `textColor`                     | `string` | ❌       | `#026FF4`   |
-| `buttonAndFeedbackBarColor`     | `string` | ❌       | `#026FF4`   |
-| `buttonAndFeedbackBarTextColor` | `string` | ❌       | `#FFFFFF`   |
-| `buttonColorHighlight`          | `string` | ❌       | `#0264DC`   |
-| `buttonColorDisabled`           | `string` | ❌       | `#B3D4FC`   |
-| `frameCornerRadius`             | `string` | ❌       | `20px`      |
-| `cancelImage`                   | `string` | ❌       | `undefined` |
-| `brandingImage`                 | `string` | ❌       | `undefined` |
+| Property                        | Type                                | Required | Default     |
+| ------------------------------- | ----------------------------------- | -------- | ----------- |
+| `backgroundColor`               | `string`                            | ❌       | `#FFFFFF`   |
+| `frameColor`                    | `string`                            | ❌       | `#FFFFFF`   |
+| `borderColor`                   | `string`                            | ❌       | `#026FF4`   |
+| `ovalColor`                     | `string`                            | ❌       | `#026FF4`   |
+| `dualSpinnerColor`              | `string`                            | ❌       | `#026FF4`   |
+| `textColor`                     | `string`                            | ❌       | `#026FF4`   |
+| `buttonAndFeedbackBarColor`     | `string`                            | ❌       | `#026FF4`   |
+| `buttonAndFeedbackBarTextColor` | `string`                            | ❌       | `#FFFFFF`   |
+| `buttonColorHighlight`          | `string`                            | ❌       | `#0264DC`   |
+| `buttonColorDisabled`           | `string`                            | ❌       | `#B3D4FC`   |
+| `frameCornerRadius`             | `string`                            | ❌       | `20px`      |
+| `cancelImage`                   | `string`                            | ❌       | `undefined` |
+| `cancelLocation`                | [`CancelLocation`](#cancellocation) | ❌       | `top-left`  |
+| `brandingImage`                 | `string`                            | ❌       | `undefined` |
+| `showBranding`                  | `boolean`                           | ❌       | `true`      |
+
+#### `CancelLocation`
+
+The `CancelLocation` type defines where the cancel button will be shown.
+
+| type        | Description                          |
+| ----------- | ------------------------------------ |
+| `top-left`  | Displays cancel button in top-left.  |
+| `top-right` | Displays cancel button in top-right. |
+| `none`      | Hides the cancel button.             |
 
 ### Locale
 
@@ -561,14 +659,14 @@ The `Locale` type uses the [ISO 639](https://en.wikipedia.org/wiki/List_of_ISO_6
 
 ### `SessionError`
 
-A `SessionError` class is returned when an error is thrown by the Aziface SDK.
+A `SessionError` is thrown when an error occurs in the Aziface SDK.
 
 | Property  | Type                          | Required |
 | --------- | ----------------------------- | -------- |
 | `code`    | [`SessionCode`](#sessioncode) | ✅       |
 | `name`    | `string`                      | ✅       |
 | `message` | `string`                      | ✅       |
-| `cause`   | `string`                      | ✅       |
+| `cause`   | `string`                      | ❌       |
 | `stack`   | `string`                      | ❌       |
 
 #### `constructor`

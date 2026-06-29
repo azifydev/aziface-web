@@ -12,14 +12,18 @@
     "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspaces --if-present",
     "release": "cd packages/aziface && npm run build && npx semantic-release",
-    "clean": "npm run clean --workspaces --if-present"
+    "clean": "npm run clean --workspaces --if-present",
+    "next:dev": "npm run dev -w nextapp",
+    "next:build": "npm run build -w nextapp",
+    "vite:dev": "npm run dev -w viteapp",
+    "vite:build": "npm run build -w viteapp"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/azifydev/aziface-web.git"
   },
   "keywords": [],
-   "author": "Azify (https://github.com/azifydev)",
+  "author": "Azify (https://github.com/azifydev)",
   "license": "MIT",
   "type": "commonjs",
   "bugs": {

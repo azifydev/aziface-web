@@ -1,4 +1,7 @@
-import { FaceTecInitializationError, FaceTecSessionStatus } from '../types/FaceTecPublicApi';
+import {
+  FaceTecInitializationError,
+  FaceTecSessionStatus,
+} from '../types/FaceTecPublicApi';
 
 /**
  * @enum MethodError
@@ -37,6 +40,16 @@ export type SessionCode = FaceTecSessionStatus | MethodError;
  * application.
  */
 export type InitializeCodeError = FaceTecInitializationError;
+
+/**
+ * @type CancelLocation
+ *
+ * @description A type that represents the possible locations for the cancel button
+ * in the Aziface UI. This type includes options for the `top-left` and `top-right`
+ * corners of the UI, as well as an option to not display the cancel button at
+ * all.
+ */
+export type CancelLocation = 'top-left' | 'top-right' | 'none';
 
 /**
  * @interface InitializeParams
@@ -257,11 +270,28 @@ export interface Style {
 
   /**
    * @description The location of the cancel button in the Aziface UI. Uses the
+   * default location provided by the SDK if not specified.
+   *
+   * @default 'top-left'
+   */
+  cancelLocation?: CancelLocation;
+
+  /**
+   * @description The location of the cancel button in the Aziface UI. Uses the
    * default branding image provided by the SDK if not specified.
    *
    * @default undefined
    */
   brandingImage?: string;
+
+  /**
+   * @description A boolean value indicating whether to show the branding image in
+   * the Aziface UI. Uses the default branding image provided by the SDK if not
+   * specified.
+   *
+   * @default true
+   */
+  showBranding?: boolean;
 }
 
 /**
@@ -299,16 +329,30 @@ export interface DisposeCallback {
  * Aziface SDK. This type includes a list of language codes that can be used to
  * set the locale of the SDK.
  */
-export type Locale = 'af' | 'ar' | 'de' | 'el' | 'en' | 'es' | 'fr' | 'ja' | 'kk' | 'no' | 'pt-BR' | 'ru' | 'vi' | 'zh';
+export type Locale =
+  | 'af'
+  | 'ar'
+  | 'de'
+  | 'el'
+  | 'en'
+  | 'es'
+  | 'fr'
+  | 'ja'
+  | 'kk'
+  | 'no'
+  | 'pt-BR'
+  | 'ru'
+  | 'vi'
+  | 'zh';
 
 export interface Controller {
   initialize: (init: Initialize, callback: InitializeCallback) => void;
   dispose: (callback: DisposeCallback) => void;
-  enroll: () => void;
-  authenticate: () => void;
-  liveness: () => void;
-  photoScan: () => void;
-  photoMatch: () => void;
+  enroll: () => Promise<boolean>;
+  authenticate: () => Promise<boolean>;
+  liveness: () => Promise<boolean>;
+  photoScan: () => Promise<boolean>;
+  photoMatch: () => Promise<boolean>;
   withTheme: (overrides?: Style) => void;
   setLocale: (locale: Locale) => void;
 }

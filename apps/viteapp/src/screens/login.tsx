@@ -5,7 +5,8 @@ export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { mutateAsync: login, isPending: isPendingLogin } = useLogin();
-  const { mutateAsync: createSession, isPending: isPendingSession } = useBiometricSession();
+  const { mutateAsync: createSession, isPending: isPendingSession } =
+    useBiometricSession();
 
   const handleLogin = async () => {
     try {
@@ -29,7 +30,7 @@ export function Login() {
           <input
             type='text'
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             placeholder='seu.usuario'
             className='w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-300'
           />
@@ -40,7 +41,7 @@ export function Login() {
           <input
             type='password'
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             placeholder='••••••••'
             className='w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-300'
           />

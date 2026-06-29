@@ -12,6 +12,7 @@ export {
 } from './module/aziface';
 
 export type {
+  CancelLocation,
   DisposeCallback,
   Initialize,
   InitializeCallback,

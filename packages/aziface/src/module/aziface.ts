@@ -1,9 +1,13 @@
-import { FaceTecInitializationError, FaceTecSDKInstance, FaceTecSessionStatus } from '../types/FaceTecPublicApi';
+import {
+  FaceTecInitializationError,
+  FaceTecSDKInstance,
+  FaceTecSessionStatus,
+} from '../types/FaceTecPublicApi';
 import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
 import { SessionError } from '../errors/errors';
 import { SessionRequestProcessor } from '../services/request-processor';
 import { applyTheme, getBackgroundColor } from '../styles/theme';
-import { getInitializationErrorCauseByCode } from '../utils/utils';
+import { getInitializationErrorCauseByCode } from '../utils';
 import {
   Controller,
   DisposeCallback,
@@ -26,7 +30,10 @@ export class AzifaceController implements Controller {
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
-  public initialize = (init: Initialize, callback: InitializeCallback): void => {
+  public initialize = (
+    init: Initialize,
+    callback: InitializeCallback,
+  ): void => {
     this.setupController(init);
 
     FaceTecSDK.setImagesDirectory(`/core/images`);
@@ -42,30 +49,35 @@ export class AzifaceController implements Controller {
       return;
     }
 
-    const sessionRequestProcessor: SessionRequestProcessor = new SessionRequestProcessor(
-      this.generateExternalDatabaseRefID(),
-      this.onComplete,
-    );
+    const sessionRequestProcessor: SessionRequestProcessor =
+      new SessionRequestProcessor(
+        this.generateExternalDatabaseRefID(),
+        this.onComplete,
+      );
 
-    FaceTecSDK.initializeWithSessionRequest(AzifaceController.deviceKeyIdentifier, sessionRequestProcessor, {
-      onSuccess: (newFaceTecSdkInstance: FaceTecSDKInstance) => {
-        this.onInitializationSuccess(newFaceTecSdkInstance);
-        callback({
-          isSuccess: true,
-          error: undefined,
-        });
+    FaceTecSDK.initializeWithSessionRequest(
+      AzifaceController.deviceKeyIdentifier,
+      sessionRequestProcessor,
+      {
+        onSuccess: (newFaceTecSdkInstance: FaceTecSDKInstance) => {
+          this.onInitializationSuccess(newFaceTecSdkInstance);
+          callback({
+            isSuccess: true,
+            error: undefined,
+          });
+        },
+        onError: (initializationError: FaceTecInitializationError) => {
+          this.onInitializationError();
+          callback({
+            isSuccess: false,
+            error: {
+              code: initializationError,
+              cause: getInitializationErrorCauseByCode(initializationError),
+            },
+          });
+        },
       },
-      onError: (initializationError: FaceTecInitializationError) => {
-        this.onInitializationError();
-        callback({
-          isSuccess: false,
-          error: {
-            code: initializationError,
-            cause: getInitializationErrorCauseByCode(initializationError),
-          },
-        });
-      },
-    });
+    );
   };
 
   public dispose = (callback: DisposeCallback): void => {
@@ -83,8 +95,8 @@ export class AzifaceController implements Controller {
     }
   };
 
-  public authenticate = (): void =>
-    this.decorator((instance) => {
+  public authenticate = async (): Promise<boolean> => {
+    return await this.decoratorAsync(instance => {
       if (AzifaceController.latestExternalDatabaseRefID.length === 0) {
         throw new SessionError(MethodError.NoUserEnrolled);
       } else {
@@ -93,48 +105,59 @@ export class AzifaceController implements Controller {
         this.onAttach();
       }
     });
+  };
 
-  public enroll = (): void =>
-    this.decorator((instance) => {
-      AzifaceController.latestExternalDatabaseRefID = this.generateExternalDatabaseRefID();
+  public enroll = async (): Promise<boolean> => {
+    return await this.decoratorAsync(instance => {
+      AzifaceController.latestExternalDatabaseRefID =
+        this.generateExternalDatabaseRefID();
 
       const processor = this.makeSessionRequestProcessor();
       instance.start3DLiveness(processor);
       this.onAttach();
     });
+  };
 
-  public liveness = (): void =>
-    this.decorator((instance) => {
+  public liveness = async (): Promise<boolean> => {
+    return await this.decoratorAsync(instance => {
       AzifaceController.latestExternalDatabaseRefID = '';
 
       const processor = this.makeSessionRequestProcessor();
       instance.start3DLiveness(processor);
       this.onAttach();
     });
+  };
 
-  public photoMatch = (): void =>
-    this.decorator((instance) => {
-      AzifaceController.latestExternalDatabaseRefID = this.generateExternalDatabaseRefID();
+  public photoMatch = async (): Promise<boolean> => {
+    return await this.decoratorAsync(instance => {
+      AzifaceController.latestExternalDatabaseRefID =
+        this.generateExternalDatabaseRefID();
 
       const processor = this.makeSessionRequestProcessor();
       instance.start3DLivenessThen3D2DPhotoIDMatch(processor);
       this.onAttach();
     });
+  };
 
-  public photoScan = (): void =>
-    this.decorator((instance) => {
-      AzifaceController.latestExternalDatabaseRefID = this.generateExternalDatabaseRefID();
+  public photoScan = async (): Promise<boolean> => {
+    return await this.decoratorAsync(instance => {
+      AzifaceController.latestExternalDatabaseRefID =
+        this.generateExternalDatabaseRefID();
 
       const processor = this.makeSessionRequestProcessor();
       instance.startIDScanOnly(processor);
       this.onAttach();
     });
+  };
 
   public withTheme = (overrides?: Style): void => applyTheme(overrides);
 
-  public setLocale = (locale: Locale): void => this.decorator(() => FaceTecSDK.configureLocalization(i18n[locale]));
+  public setLocale = (locale: Locale): void =>
+    this.decoratorSync(() => FaceTecSDK.configureLocalization(i18n[locale]));
 
-  private decorator = (callback: (instance: FaceTecSDKInstance) => void): void => {
+  private decoratorSync = (
+    callback: (instance: FaceTecSDKInstance) => void,
+  ): void => {
     if (!AzifaceController.isInitialized || !this.faceTecSDKInstance) {
       throw new SessionError(MethodError.NotInitialized);
     } else {
@@ -142,11 +165,28 @@ export class AzifaceController implements Controller {
     }
   };
 
+  private decoratorAsync = (
+    callback: (instance: FaceTecSDKInstance) => void,
+  ): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      try {
+        this.decoratorSync(callback);
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
   private makeSessionRequestProcessor = (): SessionRequestProcessor =>
-    new SessionRequestProcessor(AzifaceController.latestExternalDatabaseRefID, this.onComplete);
+    new SessionRequestProcessor(
+      AzifaceController.latestExternalDatabaseRefID,
+      this.onComplete,
+    );
 
   private setupController = (init: Initialize): void => {
-    AzifaceController.deviceKeyIdentifier = init?.params?.deviceKeyIdentifier || '';
+    AzifaceController.deviceKeyIdentifier =
+      init?.params?.deviceKeyIdentifier || '';
     AzifaceController.baseUrl = init?.params?.baseUrl || '';
     AzifaceController.isDevelopment = init?.params?.isDevelopment || false;
     AzifaceController.headers = init?.headers;
@@ -163,9 +203,12 @@ export class AzifaceController implements Controller {
     this.withTheme();
   };
 
-  private generateExternalDatabaseRefID = (): string => `aziface_web_${crypto.randomUUID()}`;
+  private generateExternalDatabaseRefID = (): string =>
+    `aziface_web_${crypto.randomUUID()}`;
 
-  private onInitializationSuccess = (newFaceTecSdkInstance: FaceTecSDKInstance): void => {
+  private onInitializationSuccess = (
+    newFaceTecSdkInstance: FaceTecSDKInstance,
+  ): void => {
     this.faceTecSDKInstance = newFaceTecSdkInstance;
     AzifaceController.isInitialized = true;
   };
@@ -173,14 +216,17 @@ export class AzifaceController implements Controller {
   private onInitializationError = (): void => this.cleanup();
 
   private onComplete = (faceTecSessionStatus: FaceTecSessionStatus): void => {
-    const isError = faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
+    const isError =
+      faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
     if (isError) {
       throw new SessionError(faceTecSessionStatus);
     }
   };
 
   private onAttach = () => {
-    const container = document.getElementById('DOM_FT_PRIMARY_TOPLEVEL_mainContainer');
+    const container = document.getElementById(
+      'DOM_FT_PRIMARY_TOPLEVEL_mainContainer',
+    );
 
     if (container) {
       container.style.backgroundColor = getBackgroundColor();
@@ -192,7 +238,10 @@ export class AzifaceController implements Controller {
 
 const controller = new AzifaceController();
 
-export function initialize(init: Initialize, callback: InitializeCallback): void {
+export function initialize(
+  init: Initialize,
+  callback: InitializeCallback,
+): void {
   controller.initialize(init, callback);
 }
 
@@ -200,24 +249,24 @@ export function dispose(callback: DisposeCallback): void {
   controller.dispose(callback);
 }
 
-export function enroll(): void {
-  controller.enroll();
+export async function enroll(): Promise<boolean> {
+  return await controller.enroll();
 }
 
-export function authenticate(): void {
-  controller.authenticate();
+export async function authenticate(): Promise<boolean> {
+  return await controller.authenticate();
 }
 
-export function liveness(): void {
-  controller.liveness();
+export async function liveness(): Promise<boolean> {
+  return await controller.liveness();
 }
 
-export function photoMatch(): void {
-  controller.photoMatch();
+export async function photoMatch(): Promise<boolean> {
+  return await controller.photoMatch();
 }
 
-export function photoScan(): void {
-  controller.photoScan();
+export async function photoScan(): Promise<boolean> {
+  return await controller.photoScan();
 }
 
 export function withTheme(overrides?: Style): void {

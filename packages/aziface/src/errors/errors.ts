@@ -1,5 +1,5 @@
 import { SessionCode } from '../types/aziface';
-import { getSessionStatusCauseByCode } from '../utils/utils';
+import { getSessionStatusCauseByCode } from '../utils';
 
 export class SessionError extends Error {
   constructor(public code: SessionCode) {
