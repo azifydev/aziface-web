@@ -244,13 +244,13 @@ export class AzifaceController implements Controller {
 
     window.addEventListener('click', styleObserver);
 
-    this.internalID = window.setInterval(() => {
-      const windowClickEvent = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      });
+    const windowClickEvent = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+    });
 
+    this.internalID = window.setInterval(() => {
       window.dispatchEvent(windowClickEvent);
     }, 250);
   };
