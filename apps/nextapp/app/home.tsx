@@ -41,7 +41,7 @@ export function Home() {
       'x-only-raw-analysis': '1',
     };
 
-    initialize({ params, headers }, async initialized => {
+    initialize({ params, headers }, initialized => {
       const error = initialized.error;
 
       setIsInitialized(initialized.isSuccess);
@@ -49,7 +49,6 @@ export function Home() {
         toast.error(`(${error.code}) - ${error.cause}`);
       } else {
         setLocale(i18n);
-        await liveness();
       }
     });
   };
