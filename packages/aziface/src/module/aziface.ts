@@ -7,7 +7,7 @@ import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
 import { SessionError } from '../errors/errors';
 import { SessionRequestProcessor } from '../services/request-processor';
 import { applyTheme, getBackgroundColor } from '../styles/theme';
-import { getInitializationErrorCauseByCode } from '../utils';
+import { getInitializationErrorCauseByCode, styleObserver } from '../utils';
 import {
   Controller,
   DisposeCallback,
@@ -30,6 +30,8 @@ export class AzifaceController implements Controller {
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
+  private internalID: number | undefined = undefined;
+
   public initialize = (
     init: Initialize,
     callback: InitializeCallback,
@@ -200,6 +202,9 @@ export class AzifaceController implements Controller {
     AzifaceController.baseUrl = '';
     AzifaceController.headers = {} as InitializeHeaders;
 
+    window.removeEventListener('click', styleObserver);
+    window.clearInterval(this.internalID);
+
     this.withTheme();
   };
 
@@ -216,6 +221,9 @@ export class AzifaceController implements Controller {
   private onInitializationError = (): void => this.cleanup();
 
   private onComplete = (faceTecSessionStatus: FaceTecSessionStatus): void => {
+    window.removeEventListener('click', styleObserver);
+    window.clearInterval(this.internalID);
+
     const isError =
       faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
     if (isError) {
@@ -233,6 +241,27 @@ export class AzifaceController implements Controller {
     } else {
       throw new SessionError(MethodError.NotInitialized);
     }
+
+    // DOM_FT_frameGetReadyOvalMask
+    // DOM_FT_frameOutsideOvalSVG
+    // const frameGetReadyOvalPath = document.getElementById(
+    //   'DOM_FT_frameGetReadyOvalPath',
+    // ) as SVGPathElement | null;
+    // const frameOvalPath = document.getElementById('DOM_FT_frameOvalPath');
+    // const frameOutsideOvalMask = document.getElementById(
+    //   'DOM_FT_frameOutsideOvalMask',
+    // );
+    window.addEventListener('click', styleObserver);
+
+    this.internalID = window.setInterval(() => {
+      const windowClickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+      });
+
+      window.dispatchEvent(windowClickEvent);
+    }, 250);
   };
 }
 
