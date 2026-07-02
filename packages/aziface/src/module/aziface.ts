@@ -242,15 +242,6 @@ export class AzifaceController implements Controller {
       throw new SessionError(MethodError.NotInitialized);
     }
 
-    // DOM_FT_frameGetReadyOvalMask
-    // DOM_FT_frameOutsideOvalSVG
-    // const frameGetReadyOvalPath = document.getElementById(
-    //   'DOM_FT_frameGetReadyOvalPath',
-    // ) as SVGPathElement | null;
-    // const frameOvalPath = document.getElementById('DOM_FT_frameOvalPath');
-    // const frameOutsideOvalMask = document.getElementById(
-    //   'DOM_FT_frameOutsideOvalMask',
-    // );
     window.addEventListener('click', styleObserver);
 
     this.internalID = window.setInterval(() => {
