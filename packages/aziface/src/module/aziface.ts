@@ -7,7 +7,10 @@ import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
 import { SessionError } from '../errors/errors';
 import { SessionRequestProcessor } from '../services/request-processor';
 import { applyTheme, getBackgroundColor } from '../styles/theme';
-import { getInitializationErrorCauseByCode, styleObserver } from '../utils';
+import {
+  getInitializationErrorCauseByCode,
+  applyResponsiveStyles,
+} from '../utils';
 import {
   Controller,
   DisposeCallback,
@@ -202,7 +205,7 @@ export class AzifaceController implements Controller {
     AzifaceController.baseUrl = '';
     AzifaceController.headers = {} as InitializeHeaders;
 
-    window.removeEventListener('click', styleObserver);
+    window.removeEventListener('click', applyResponsiveStyles);
     window.clearInterval(this.internalID);
 
     this.withTheme();
@@ -221,7 +224,7 @@ export class AzifaceController implements Controller {
   private onInitializationError = (): void => this.cleanup();
 
   private onComplete = (faceTecSessionStatus: FaceTecSessionStatus): void => {
-    window.removeEventListener('click', styleObserver);
+    window.removeEventListener('click', applyResponsiveStyles);
     window.clearInterval(this.internalID);
 
     const isError =
@@ -242,7 +245,7 @@ export class AzifaceController implements Controller {
       throw new SessionError(MethodError.NotInitialized);
     }
 
-    window.addEventListener('click', styleObserver);
+    window.addEventListener('click', applyResponsiveStyles);
 
     const windowClickEvent = new MouseEvent('click', {
       bubbles: true,

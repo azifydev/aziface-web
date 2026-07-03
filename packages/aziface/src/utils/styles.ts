@@ -2,6 +2,7 @@ import { CancelLocation } from '../types/aziface';
 import type { FaceTecCancelButtonLocation } from '../types/FaceTecCustomization';
 
 const PREFIX = 'DOM_FT_';
+const SAFE_MARGIN = 48;
 const CANCEL_BUTTON_LOCATION = {
   Disabled: 0 as FaceTecCancelButtonLocation,
   TopLeft: 1 as FaceTecCancelButtonLocation,
@@ -22,58 +23,110 @@ function setStyle(id: string, style: string): void {
   if (element) element.setAttribute('style', style);
 }
 
+function isMobile(): boolean {
+  return window.innerWidth <= 768;
+}
+
 function isRequestingPermission(): boolean {
-  const ID = `${PREFIX}cameraPermissionsScreen`;
-  const currentStyle = getStyle(ID);
+  const id = `${PREFIX}cameraPermissionsScreen`;
+  const currentStyle = getStyle(id);
   return currentStyle.includes('display: flex;');
 }
 
 function adjustFrameContainer(): void {
-  const { innerWidth } = window;
-  if (innerWidth > 768) return;
+  if (!isMobile()) return;
 
-  const ID = `${PREFIX}frameContainer`;
-  if (!!getElementById(ID)) {
-    const currentStyle = getStyle(ID);
+  const id = `${PREFIX}frameContainer`;
+  if (!!getElementById(id)) {
+    const currentStyle = getStyle(id);
     const newStyle = 'top: 0px !important; left: 0px !important;';
     const isRequesting = isRequestingPermission();
     const hasStyle = currentStyle.includes(newStyle);
 
-    if (!hasStyle && !isRequesting) setStyle(ID, `${currentStyle} ${newStyle}`);
-    else if (hasStyle && isRequesting) {
+    if (!hasStyle && !isRequesting) {
+      setStyle(id, `${currentStyle} ${newStyle}`);
+    } else if (hasStyle && isRequesting) {
       const replatedStyle = currentStyle.replace(
         newStyle,
         'top: -2px !important; left: -2px !important;',
       );
-      setStyle(ID, replatedStyle);
+      setStyle(id, replatedStyle);
+    }
+  }
+}
+
+function adjustCancelButtonElementBase(id: string, style: string): void {
+  if (!isMobile() || !getElementById(id)) return;
+
+  if (isRequestingPermission()) {
+    setStyle(id, style);
+  } else {
+    const left = window.innerWidth > 400 ? '20%' : '22%';
+    const newStyle = `left: ${left} !important;`;
+    const currentStyle = getStyle(id);
+    if (!currentStyle.includes(newStyle)) {
+      setStyle(id, `${currentStyle} ${newStyle}`);
     }
   }
 }
 
 function adjustCancelButtonElement(): void {
-  const { innerWidth } = window;
-  if (innerWidth > 768) return;
+  adjustCancelButtonElementBase(
+    `${PREFIX}cancelButtonElement`,
+    'left: 0px !important; height: 16px; width: 16px; padding: 15px; margin: 0px; opacity: 1; display: block; transition: opacity 500ms;',
+  );
+  adjustCancelButtonElementBase(
+    `${PREFIX}idScanCancelButtonElement`,
+    'height: 16px; width: 16px; padding: 8px; margin: 8px; top: 0px; left: 0px; opacity: 1; display: flex; transition: opacity 2000ms;',
+  );
+}
 
-  const ID = `${PREFIX}cancelButtonElement`;
-  if (!!getElementById(ID)) {
-    if (isRequestingPermission()) {
-      const style =
-        'left: 0px !important; height: 16px; width: 16px; padding: 15px; margin: 0px; opacity: 1; display: block; transition: opacity 500ms;';
-      setStyle(ID, style);
-    } else {
-      const left = innerWidth > 400 ? '20%' : '22%';
-      const newStyle = `left: ${left} !important;`;
-      const currentStyle = getStyle(ID);
-      if (!currentStyle.includes(newStyle)) {
-        setStyle(ID, `${currentStyle} ${newStyle}`);
+function adjustIdScanMask(): void {
+  if (!isMobile()) return;
+
+  const startY = '12px';
+  const mask = getElementById(`${PREFIX}idScanCaptureFrameMask`);
+  if (mask) {
+    const [, rect] = mask.children;
+    rect.setAttribute('style', '');
+    rect.setAttribute('y', startY);
+  }
+
+  const rectId = `${PREFIX}idScanCaptureFrameRect`;
+  const rect = getElementById(rectId);
+  if (rect) {
+    setStyle(rectId, '');
+    rect.setAttribute('y', startY);
+  }
+}
+
+function adjustOCRFormContainer(): void {
+  if (!isMobile()) return;
+
+  const id = `${PREFIX}ocrFormContainer`;
+  const element = getElementById(id);
+  if (element) {
+    const [form] = element.children;
+
+    for (const child of form.children) {
+      if (child.tagName === 'SECTION') {
+        for (const sectionChild of child.children) {
+          if (sectionChild.tagName === 'DIV') {
+            const width = window.innerWidth - SAFE_MARGIN;
+            const currentStyle = sectionChild.getAttribute('style') || '';
+            const newStyle = `margin: 0px auto; display: block; width: ${width}px;`;
+            if (!currentStyle.includes(newStyle)) {
+              sectionChild.setAttribute('style', newStyle);
+            }
+          }
+        }
       }
     }
   }
 }
 
 function generateDPath(): string | null {
-  const { innerWidth } = window;
-  if (innerWidth > 768) return null;
+  if (!isMobile()) return null;
 
   const VIEW_BOX = 640;
   const OVAL = 158;
@@ -86,7 +139,7 @@ function generateDPath(): string | null {
 }
 
 function removeElementById(id: string): void {
-  if (window.innerWidth > 768) return;
+  if (!isMobile()) return;
 
   const element = getElementById(id);
   if (element) element.remove();
@@ -98,12 +151,14 @@ function setDPath(id: string): void {
   if (element && d) element.setAttribute('d', d);
 }
 
-export function styleObserver(): void {
+export function applyResponsiveStyles(): void {
   removeElementById(`${PREFIX}ovalSpinner1`);
   removeElementById(`${PREFIX}ovalSpinner2`);
 
   adjustCancelButtonElement();
   adjustFrameContainer();
+  adjustIdScanMask();
+  adjustOCRFormContainer();
 
   setDPath(`${PREFIX}frameGetReadyOvalPath`);
   setDPath(`${PREFIX}frameOvalPath`);
