@@ -18,11 +18,6 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
     - [`Properties`](#properties)
   - [`dispose`](#dispose)
     - [`Properties`](#properties-1)
-  - [`enroll`](#enroll)
-  - [`authenticate`](#authenticate)
-  - [`liveness`](#liveness)
-  - [`photoScan`](#photoscan)
-  - [`photoMatch`](#photomatch)
   - [`withTheme`](#withtheme)
     - [`Properties`](#properties-2)
     - [`Custom images`](#custom-images)
@@ -30,6 +25,14 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
   - [`resetTheme`](#resettheme)
   - [`setLocale`](#setlocale)
     - [`Properties`](#properties-3)
+- [Hooks]
+  - [`useAziface`](#useaziface)
+    - [`Properties`](#properties-4)
+      - [`enroll`](#enroll)
+      - [`authenticate`](#authenticate)
+      - [`liveness`](#liveness)
+      - [`photoScan`](#photoscan)
+      - [`photoMatch`](#photomatch)
 - [Styles](#styles)
 - [Types](#types)
   - [`Initialize`](#initialize-1)
@@ -57,21 +60,25 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
 - **FaceTec static assets** hosted by your application (not bundled in the npm package)
 - Valid Aziface credentials: `deviceKeyIdentifier`, `baseUrl`, and `x-token-bearer`
 
+<hr/>
+
 ## Installation
 
 ```bash
 npm i @azify/aziface-web
 ```
 
+<hr/>
+
 ## Static assets
 
 The SDK expects FaceTec resources to be available at runtime. Host the following paths in your app's public directory:
 
-| Path | Purpose |
-| --- | --- |
-| `/core/facetec/FaceTecSDK.js` | FaceTec browser SDK (loaded via `<script>`) |
-| `/core/facetec/resources/` | FaceTec resource bundle |
-| `/core/images/` | Branding and cancel button images (optional; used by `withTheme`) |
+| Path                          | Purpose                                                           |
+| ----------------------------- | ----------------------------------------------------------------- |
+| `/core/facetec/FaceTecSDK.js` | FaceTec browser SDK (loaded via `<script>`)                       |
+| `/core/facetec/resources/`    | FaceTec resource bundle                                           |
+| `/core/images/`               | Branding and cancel button images (optional; used by `withTheme`) |
 
 Reference implementations live in this monorepo:
 
@@ -143,7 +150,7 @@ Typical integration flow:
 2. Import SDK methods and styles (`@azify/aziface-web/dist/aziface.css`)
 3. Call `initialize()` once with credentials and headers
 4. Optionally call `setLocale()` and `withTheme()` after a successful init
-5. Run session methods: `enroll`, `authenticate`, `liveness`, `photoScan`, or `photoMatch`
+5. Use `useAziface()` to access session methods: `enroll`, `authenticate`, `liveness`, `photoScan`, and `photoMatch`
 6. Call `dispose()` when the SDK is no longer needed
 
 Session methods throw [`SessionError`](#sessionerror) on failure — always wrap them in `try/catch`.
@@ -155,17 +162,12 @@ Session methods throw [`SessionError`](#sessionerror) on failure — always wrap
 ```tsx
 // ...
 import {
-  authenticate,
   dispose,
-  enroll,
   initialize,
-  liveness,
-  photoMatch,
-  photoScan,
   setLocale,
+  useAziface,
   withTheme,
   SessionError,
-  type Initialize,
   type InitializeHeaders,
   type InitializeParams,
 } from '@azify/aziface-web';
@@ -174,6 +176,8 @@ import '@azify/aziface-web/dist/aziface.css';
 export function MyPage() {
   // ...
   const [isInitialized, setIsInitialized] = useState(false);
+  const { data, error, authenticate, enroll, liveness, photoMatch, photoScan } =
+    useAziface();
 
   const onInitialize = (): void => {
     const params: InitializeParams = {
@@ -236,7 +240,11 @@ export function MyPage() {
       console.error(sessionError.message);
     }
   };
-  // ...
+
+  useEffect(() => {
+    if (data) console.log(data);
+    if (error) console.error(error.message);
+  }, [data, error]);
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
@@ -388,46 +396,6 @@ dispose(disposed => {
 | ---------- | ------------------------------------- | -------- |
 | `callback` | [`DisposeCallback`](#disposecallback) | ✅       |
 
-### `enroll`
-
-The `enroll` method in the Aziface SDK is responsible for registering a user’s face for the first time and creating a secure biometric identity. During enrollment, the SDK guides the user through a liveness detection process to ensure that a real person is present and not a photo, video, or spoofing attempt.
-
-While the user follows on-screen instructions (such as positioning their face within the oval and performing natural movements), the SDK captures a set of facial data and generates a secure face scan. This face scan is then encrypted and sent to the backend for processing and storage.
-
-The result of a successful enrollment is a trusted biometric template associated with the user’s identity, which can later be used for authentication, verification, or ongoing identity checks. If the enrollment fails due to poor lighting, incorrect positioning, or liveness issues, the SDK returns detailed status and error information so the application can handle retries or user feedback appropriately.
-
-### `authenticate`
-
-The `authenticate` method verifies a user's identity by comparing a newly captured face scan against a previously enrolled biometric template. This process confirms that the person attempting to access the system is the same individual who completed enrollment.
-
-During authentication, the SDK performs an active liveness check while guiding the user through simple on-screen instructions. A fresh face scan is captured, encrypted, and securely transmitted to the backend, where it is matched against the stored enrollment data.
-
-If the comparison is successful and the liveness checks pass, the authentication is approved and the user is granted access. If the process fails due to a mismatch, spoofing attempt, or poor capture conditions, the SDK returns detailed result and error codes so the application can handle denial, retries, or alternative verification flows.
-
-### `liveness`
-
-The `liveness` method in the Aziface SDK is designed to determine whether the face presented to the camera belongs to a real, live person at the time of capture, without necessarily verifying their identity against a stored template.
-
-In this flow, the SDK guides the user through a short interaction to capture facial movements and depth cues that are difficult to replicate with photos, videos, or masks. The resulting face scan is encrypted and sent to the backend, where advanced liveness detection algorithms analyze it for signs of spoofing or fraud.
-
-A successful liveness result confirms real human presence and can be used as a standalone security check or as part of broader workflows such as authentication, onboarding, or high-risk transactions. If the liveness check fails, the SDK provides detailed feedback to allow the application to respond appropriately.
-
-### `photoMatch`
-
-The `photoMatch` method in the Aziface SDK is used to verify a user’s identity by analyzing a government-issued identity document and comparing it with the user’s live facial biometric data.
-
-In this flow, the SDK first guides the user to capture high-quality images of their identity document. Then, a face scan is collected through a liveness-enabled facial capture. Both the document images and the face scan are encrypted and securely transmitted to the backend.
-
-A successful result provides strong identity assurance, combining document authenticity and biometric verification. This flow is commonly used in regulated onboarding, KYC, and high-security access scenarios. If any step fails, the SDK returns detailed results and error information to support retries or alternative verification paths.
-
-### `photoScan`
-
-The `photoScan` method in the Aziface SDK is used to verify the authenticity and validity of a government-issued identity document without performing facial biometric verification.
-
-In this flow, the SDK guides the user to capture images of the identity document, ensuring proper framing, focus, and lighting. The captured document images are encrypted and securely sent to the backend for analysis.
-
-A successful document-only verification is suitable for lower-risk scenarios or cases where biometric capture is not required. If the verification fails due to image quality issues, unsupported documents, or suspected tampering, the SDK provides detailed feedback for proper error handling and user guidance.
-
 ### `withTheme`
 
 This method customizes your SDK theme during a session. The Aziface SDK must be successfully initialized **before calling** this API.
@@ -524,6 +492,71 @@ initialize(
 
 <hr/>
 
+## Hooks
+
+### `useAziface`
+
+The `useAziface` hook centralizes the session methods and exposes reactive `data` and `error` values.
+
+```ts
+const { data, error, enroll, authenticate, liveness, photoMatch, photoScan } =
+  useAziface();
+```
+
+#### Properties
+
+| Property                        | Type                       |
+| ------------------------------- | -------------------------- |
+| `data`                          | `SessionCode \| undefined` |
+| `error`                         | `Error \| undefined`       |
+| [`enroll`](#enroll)             | `Promise<boolean>`         |
+| [`authenticate`](#authenticate) | `Promise<boolean>`         |
+| [`liveness`](#liveness)         | `Promise<boolean>`         |
+| [`photoMatch`](#photomatch)     | `Promise<boolean>`         |
+| [`photoScan`](#photoscan)       | `Promise<boolean>`         |
+
+##### `enroll`
+
+The `enroll` method (returned by `useAziface()`) is responsible for registering a user’s face for the first time and creating a secure biometric identity. During enrollment, the SDK guides the user through a liveness detection process to ensure that a real person is present and not a photo, video, or spoofing attempt.
+
+While the user follows on-screen instructions (such as positioning their face within the oval and performing natural movements), the SDK captures a set of facial data and generates a secure face scan. This face scan is then encrypted and sent to the backend for processing and storage.
+
+The result of a successful enrollment is a trusted biometric template associated with the user’s identity, which can later be used for authentication, verification, or ongoing identity checks. If the enrollment fails due to poor lighting, incorrect positioning, or liveness issues, the SDK returns detailed status and error information so the application can handle retries or user feedback appropriately.
+
+##### `authenticate`
+
+The `authenticate` method (returned by `useAziface()`) verifies a user's identity by comparing a newly captured face scan against a previously enrolled biometric template. This process confirms that the person attempting to access the system is the same individual who completed enrollment.
+
+During authentication, the SDK performs an active liveness check while guiding the user through simple on-screen instructions. A fresh face scan is captured, encrypted, and securely transmitted to the backend, where it is matched against the stored enrollment data.
+
+If the comparison is successful and the liveness checks pass, the authentication is approved and the user is granted access. If the process fails due to a mismatch, spoofing attempt, or poor capture conditions, the SDK returns detailed result and error codes so the application can handle denial, retries, or alternative verification flows.
+
+##### `liveness`
+
+The `liveness` method (returned by `useAziface()`) is designed to determine whether the face presented to the camera belongs to a real, live person at the time of capture, without necessarily verifying their identity against a stored template.
+
+In this flow, the SDK guides the user through a short interaction to capture facial movements and depth cues that are difficult to replicate with photos, videos, or masks. The resulting face scan is encrypted and sent to the backend, where advanced liveness detection algorithms analyze it for signs of spoofing or fraud.
+
+A successful liveness result confirms real human presence and can be used as a standalone security check or as part of broader workflows such as authentication, onboarding, or high-risk transactions. If the liveness check fails, the SDK provides detailed feedback to allow the application to respond appropriately.
+
+##### `photoMatch`
+
+The `photoMatch` method (returned by `useAziface()`) is used to verify a user’s identity by analyzing a government-issued identity document and comparing it with the user’s live facial biometric data.
+
+In this flow, the SDK first guides the user to capture high-quality images of their identity document. Then, a face scan is collected through a liveness-enabled facial capture. Both the document images and the face scan are encrypted and securely transmitted to the backend.
+
+A successful result provides strong identity assurance, combining document authenticity and biometric verification. This flow is commonly used in regulated onboarding, KYC, and high-security access scenarios. If any step fails, the SDK returns detailed results and error information to support retries or alternative verification paths.
+
+##### `photoScan`
+
+The `photoScan` method (returned by `useAziface()`) is used to verify the authenticity and validity of a government-issued identity document without performing facial biometric verification.
+
+In this flow, the SDK guides the user to capture images of the identity document, ensuring proper framing, focus, and lighting. The captured document images are encrypted and securely sent to the backend for analysis.
+
+A successful document-only verification is suitable for lower-risk scenarios or cases where biometric capture is not required. If the verification fails due to image quality issues, unsupported documents, or suspected tampering, the SDK provides detailed feedback for proper error handling and user guidance.
+
+<hr/>
+
 ## Styles
 
 Aziface Web recommends importing our predefined styles for the best user experience.
@@ -532,15 +565,7 @@ Simply import them onto the screen where you are using Aziface methods.
 
 ```tsx
 // ...
-import {
-  authenticate,
-  dispose,
-  enroll,
-  initialize,
-  liveness,
-  photoMatch,
-  photoScan,
-} from '@azify/aziface-web';
+import { dispose, initialize, useAziface } from '@azify/aziface-web';
 import '@azify/aziface-web/dist/aziface.css'; // <-- Add this import
 ```
 

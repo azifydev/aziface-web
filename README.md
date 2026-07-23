@@ -4,11 +4,11 @@ Monorepo for the **Aziface Web SDK** (`@azify/aziface-web`) and reference demo a
 
 ## Packages & apps
 
-| Path | Description |
-| --- | --- |
+| Path                                     | Description                                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
 | [`packages/aziface`](./packages/aziface) | Publishable SDK — biometric flows for React (enroll, authenticate, liveness, document scan) |
-| [`apps/nextapp`](./apps/nextapp) | Next.js demo app |
-| [`apps/viteapp`](./apps/viteapp) | Vite + React demo app |
+| [`apps/nextapp`](./apps/nextapp)         | Next.js demo app                                                                            |
+| [`apps/viteapp`](./apps/viteapp)         | Vite + React demo app                                                                       |
 
 **SDK documentation (installation, API, types):** [packages/aziface/README.md](./packages/aziface/README.md)
 
@@ -28,15 +28,15 @@ npm ci
 
 ### Development
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start all workspaces that expose a `dev` script |
-| `npm run next:dev` | Next.js demo at `http://localhost:3000` |
-| `npm run vite:dev` | Vite demo at `http://localhost:5173` |
-| `npm run build` | Build all workspaces |
-| `npm run next:build` | Build Next.js demo only |
-| `npm run vite:build` | Build Vite demo only |
-| `npm run clean` | Remove build artifacts |
+| Command              | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `npm run dev`        | Start all workspaces that expose a `dev` script |
+| `npm run next:dev`   | Next.js demo at `http://localhost:3000`         |
+| `npm run vite:dev`   | Vite demo at `http://localhost:5173`            |
+| `npm run build`      | Build all workspaces                            |
+| `npm run next:build` | Build Next.js demo only                         |
+| `npm run vite:build` | Build Vite demo only                            |
+| `npm run clean`      | Remove build artifacts                          |
 
 ### SDK package only
 
@@ -69,10 +69,10 @@ aziface-web/
 
 **Commit → release mapping** (configured in `.releaserc.js`):
 
-| Commit type | Version bump |
-| --- | --- |
-| `feat`, `chore` | minor |
-| `fix`, `perf`, `style` | patch |
+| Commit type               | Version bump                      |
+| ------------------------- | --------------------------------- |
+| `feat`, `chore`           | minor                             |
+| `fix`, `perf`, `style`    | patch                             |
 | `BREAKING CHANGE` in body | major (default analyzer behavior) |
 
 ### CI
@@ -104,11 +104,11 @@ Requires `GH_TOKEN` and `NPM_TOKEN` with publish access to the `@azify` scope.
 
 ### GitHub Actions secrets
 
-| Secret | Purpose |
-| --- | --- |
-| `GH_TOKEN_V2` | Push release commits, create GitHub releases |
-| `NPM_TOKEN_V2` | Publish `@azify/aziface-web` to npm (Automation token with **Read and Write** on `@azify`) |
-| `AZIFACE_ASSETS_URL` | FaceTec assets (CI/internal use) |
+| Secret               | Purpose                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| `GH_TOKEN_V2`        | Push release commits, create GitHub releases                                               |
+| `NPM_TOKEN_V2`       | Publish `@azify/aziface-web` to npm (Automation token with **Read and Write** on `@azify`) |
+| `AZIFACE_ASSETS_URL` | FaceTec assets (CI/internal use)                                                           |
 
 ## License
 
