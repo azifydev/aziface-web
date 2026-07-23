@@ -1,15 +1,12 @@
 export {
-  authenticate,
   dispose,
-  enroll,
   initialize,
-  liveness,
-  photoMatch,
-  photoScan,
   resetTheme,
   withTheme,
   setLocale,
 } from './module/aziface';
+
+export { useAziface } from './hooks/useAziface';
 
 export type {
   CancelLocation,
