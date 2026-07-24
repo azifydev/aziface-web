@@ -8,13 +8,14 @@ Use this app to validate SDK changes in a Vite environment before publishing.
 
 - Node.js 22+
 - FaceTec assets under `public/core/` (see [SDK static assets](../../packages/aziface/README.md#static-assets))
+
 ## Environment variables
 
-| Variable | App | Description |
-| --- | --- | --- |
+| Variable                     | App     | Description          |
+| ---------------------------- | ------- | -------------------- |
 | `VITE_PUBLIC_API_URL_AZTECH` | ViteApp | Aziface API base URL |
-| `VITE_PUBLIC_API_CLIENT_API` | ViteApp | Client API base URL |
-| `VITE_PUBLIC_X_API_KEY` | ViteApp | API key header |
+| `VITE_PUBLIC_API_CLIENT_API` | ViteApp | Client API base URL  |
+| `VITE_PUBLIC_X_API_KEY`      | ViteApp | API key header       |
 
 Create a `.env` file in this directory with the values above (ask the team for staging credentials).
 
@@ -38,12 +39,12 @@ npm run lint
 
 ## Project layout
 
-| Path | Description |
-| --- | --- |
-| `src/screens/` | App screens (`login`, `home`) |
-| `src/services/` | API client and biometric config |
+| Path                   | Description                      |
+| ---------------------- | -------------------------------- |
+| `src/screens/`         | App screens (`login`, `home`)    |
+| `src/services/`        | API client and biometric config  |
 | `public/core/facetec/` | FaceTec SDK script and resources |
-| `public/core/images/` | Theme images for `withTheme` |
+| `public/core/images/`  | Theme images for `withTheme`     |
 
 ## SDK integration
 
