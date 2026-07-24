@@ -19,6 +19,7 @@ import {
   InitializeHeaders,
   Locale,
   MethodError,
+  SnapshotProps,
   Style,
 } from '../types/aziface';
 import { i18n } from '../i18n';
@@ -29,11 +30,32 @@ export class AzifaceController implements Controller {
   public static isInitialized: boolean = false;
   public static isDevelopment: boolean = false;
   private static latestExternalDatabaseRefID: string = '';
+  private static listeners: Set<VoidFunction> = new Set();
+  private static currentSnapshot: SnapshotProps = {
+    data: undefined,
+    error: undefined,
+  };
+  private static oldSnapshot: SnapshotProps = {
+    data: undefined,
+    error: undefined,
+  };
   public static deviceKeyIdentifier: string = '';
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
   private internalID: number | undefined = undefined;
+
+  public static subscribe(listener: VoidFunction): VoidFunction {
+    AzifaceController.listeners.add(listener);
+
+    return () => {
+      AzifaceController.listeners.delete(listener);
+    };
+  }
+
+  public static getSnapshot(): SnapshotProps {
+    return AzifaceController.currentSnapshot;
+  }
 
   public initialize = (
     init: Initialize,
@@ -195,6 +217,12 @@ export class AzifaceController implements Controller {
     AzifaceController.baseUrl = init?.params?.baseUrl || '';
     AzifaceController.isDevelopment = init?.params?.isDevelopment || false;
     AzifaceController.headers = init?.headers;
+    AzifaceController.currentSnapshot = {
+      data: undefined,
+      error: undefined,
+    };
+
+    this.onStateChange();
   };
 
   private cleanup = (): void => {
@@ -204,11 +232,16 @@ export class AzifaceController implements Controller {
     AzifaceController.deviceKeyIdentifier = '';
     AzifaceController.baseUrl = '';
     AzifaceController.headers = {} as InitializeHeaders;
+    AzifaceController.currentSnapshot = {
+      data: undefined,
+      error: undefined,
+    };
 
     window.removeEventListener('click', applyResponsiveStyles);
     window.clearInterval(this.internalID);
 
     this.withTheme();
+    this.onStateChange();
   };
 
   private generateExternalDatabaseRefID = (): string =>
@@ -229,9 +262,30 @@ export class AzifaceController implements Controller {
 
     const isError =
       faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
-    if (isError) {
-      throw new SessionError(faceTecSessionStatus);
-    }
+
+    AzifaceController.currentSnapshot = {
+      data: isError ? undefined : faceTecSessionStatus,
+      error: isError ? new SessionError(faceTecSessionStatus) : undefined,
+    };
+
+    this.onStateChange();
+  };
+
+  private onStateChange = (): void => {
+    const didChange =
+      AzifaceController.currentSnapshot.data !==
+        AzifaceController.oldSnapshot.data ||
+      AzifaceController.currentSnapshot.error !==
+        AzifaceController.oldSnapshot.error;
+
+    if (!didChange) return;
+
+    AzifaceController.oldSnapshot = {
+      data: AzifaceController.currentSnapshot.data,
+      error: AzifaceController.currentSnapshot.error,
+    };
+
+    AzifaceController.listeners.forEach(listener => listener());
   };
 
   private onAttach = () => {
@@ -259,7 +313,7 @@ export class AzifaceController implements Controller {
   };
 }
 
-const controller = new AzifaceController();
+export const controller = new AzifaceController();
 
 export function initialize(
   init: Initialize,
@@ -270,26 +324,6 @@ export function initialize(
 
 export function dispose(callback: DisposeCallback): void {
   controller.dispose(callback);
-}
-
-export async function enroll(): Promise<boolean> {
-  return await controller.enroll();
-}
-
-export async function authenticate(): Promise<boolean> {
-  return await controller.authenticate();
-}
-
-export async function liveness(): Promise<boolean> {
-  return await controller.liveness();
-}
-
-export async function photoMatch(): Promise<boolean> {
-  return await controller.photoMatch();
-}
-
-export async function photoScan(): Promise<boolean> {
-  return await controller.photoScan();
 }
 
 export function withTheme(overrides?: Style): void {

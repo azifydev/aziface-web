@@ -1,17 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useBiometricConfigs } from '../services';
 import { useUser } from '../hooks';
 import {
-  authenticate,
   dispose,
-  enroll,
   initialize,
-  liveness,
-  photoMatch,
-  photoScan,
   setLocale,
-  SessionError,
+  useAziface,
   type InitializeParams,
   type InitializeHeaders,
   type Locale,
@@ -26,6 +21,8 @@ export function Home() {
 
   const { data: configs } = useBiometricConfigs();
   const { tokenBiometric, logout } = useUser();
+  const { error, authenticate, enroll, liveness, photoMatch, photoScan } =
+    useAziface();
 
   const onInitialize = (): void => {
     const params: InitializeParams = {
@@ -70,32 +67,31 @@ export function Home() {
   };
 
   const onFaceScan = async (type: FaceType): Promise<void> => {
-    try {
-      switch (type) {
-        case 'enroll':
-          await enroll();
-          break;
-        case 'authenticate':
-          await authenticate();
-          break;
-        case 'liveness':
-          await liveness();
-          break;
-        case 'photoMatch':
-          await photoMatch();
-          break;
-        case 'photoScan':
-          await photoScan();
-          break;
-        default:
-          toast.error(`Invalid face scan type: ${type}`);
-          break;
-      }
-    } catch (error) {
-      const sessionError = error as SessionError;
-      toast.error(sessionError.message);
+    switch (type) {
+      case 'enroll':
+        await enroll();
+        break;
+      case 'authenticate':
+        await authenticate();
+        break;
+      case 'liveness':
+        await liveness();
+        break;
+      case 'photoMatch':
+        await photoMatch();
+        break;
+      case 'photoScan':
+        await photoScan();
+        break;
+      default:
+        toast.error(`Invalid face scan type: ${type}`);
+        break;
     }
   };
+
+  useEffect(() => {
+    if (error) toast.error(error.message);
+  }, [error]);
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>

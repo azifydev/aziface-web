@@ -345,6 +345,11 @@ export type Locale =
   | 'vi'
   | 'zh';
 
+export interface SnapshotProps {
+  data?: SessionCode;
+  error?: Error;
+}
+
 export interface Controller {
   initialize: (init: Initialize, callback: InitializeCallback) => void;
   dispose: (callback: DisposeCallback) => void;
