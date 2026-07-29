@@ -34,7 +34,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          persist-credentials: false
+          token: ${{ secrets.GH_TOKEN_V2 }}
 
       - name: Sync with remote
         run: git pull --ff-only origin main
