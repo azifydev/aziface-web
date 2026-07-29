@@ -1,3 +1,5 @@
+# [1.3.0](https://github.com/azifydev/aziface-web/compare/v1.2.0...v1.3.0) (2026-07-29)
+
 ## [1.0.11](https://github.com/azifydev/aziface-web/compare/v1.0.10...v1.0.11) (2026-06-29)
 
 
