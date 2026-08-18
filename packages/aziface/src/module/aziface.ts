@@ -237,15 +237,24 @@ export class AzifaceController implements Controller {
       error: undefined,
     };
 
-    window.removeEventListener('click', applyResponsiveStyles);
     window.clearInterval(this.internalID);
 
     this.withTheme();
     this.onStateChange();
   };
 
-  private generateExternalDatabaseRefID = (): string =>
-    `aziface_web_${crypto.randomUUID()}`;
+  private generateExternalDatabaseRefID = (): string => {
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+      /[xy]/g,
+      char => {
+        const random = (Math.random() * 16) | 0;
+        const value = char === 'x' ? random : (random & 0x3) | 0x8;
+        return value.toString(16);
+      },
+    );
+
+    return `aziface_web_${uuid}`;
+  };
 
   private onInitializationSuccess = (
     newFaceTecSdkInstance: FaceTecSDKInstance,
@@ -299,17 +308,7 @@ export class AzifaceController implements Controller {
       throw new SessionError(MethodError.NotInitialized);
     }
 
-    window.addEventListener('click', applyResponsiveStyles);
-
-    const windowClickEvent = new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-    });
-
-    this.internalID = window.setInterval(() => {
-      window.dispatchEvent(windowClickEvent);
-    }, 250);
+    this.internalID = window.setInterval(applyResponsiveStyles, 250);
   };
 }
 

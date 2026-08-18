@@ -1,5 +1,6 @@
 import { CancelLocation } from '../types/aziface';
 import type { FaceTecCancelButtonLocation } from '../types/FaceTecCustomization';
+import { isMobile } from './platform';
 
 const PREFIX = 'DOM_FT_';
 const SAFE_MARGIN = 48;
@@ -21,10 +22,6 @@ function getStyle(id: string): string {
 function setStyle(id: string, style: string): void {
   const element = getElementById(id);
   if (element) element.setAttribute('style', style);
-}
-
-function isMobile(): boolean {
-  return window.innerWidth <= 768;
 }
 
 function isRequestingPermission(): boolean {
