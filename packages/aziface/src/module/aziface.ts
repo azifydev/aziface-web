@@ -7,10 +7,7 @@ import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
 import { SessionError } from '../errors/errors';
 import { SessionRequestProcessor } from '../services/request-processor';
 import { applyTheme, getBackgroundColor } from '../styles/theme';
-import {
-  getInitializationErrorCauseByCode,
-  applyResponsiveStyles,
-} from '../utils';
+import { getInitializationErrorCauseByCode } from '../utils';
 import {
   Controller,
   DisposeCallback,
@@ -43,7 +40,6 @@ export class AzifaceController implements Controller {
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
-  private internalID: number | undefined = undefined;
 
   public static subscribe(listener: VoidFunction): VoidFunction {
     AzifaceController.listeners.add(listener);
@@ -237,15 +233,22 @@ export class AzifaceController implements Controller {
       error: undefined,
     };
 
-    window.removeEventListener('click', applyResponsiveStyles);
-    window.clearInterval(this.internalID);
-
     this.withTheme();
     this.onStateChange();
   };
 
-  private generateExternalDatabaseRefID = (): string =>
-    `aziface_web_${crypto.randomUUID()}`;
+  private generateExternalDatabaseRefID = (): string => {
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+      /[xy]/g,
+      char => {
+        const random = (Math.random() * 16) | 0;
+        const value = char === 'x' ? random : (random & 0x3) | 0x8;
+        return value.toString(16);
+      },
+    );
+
+    return `aziface_web_${uuid}`;
+  };
 
   private onInitializationSuccess = (
     newFaceTecSdkInstance: FaceTecSDKInstance,
@@ -257,9 +260,6 @@ export class AzifaceController implements Controller {
   private onInitializationError = (): void => this.cleanup();
 
   private onComplete = (faceTecSessionStatus: FaceTecSessionStatus): void => {
-    window.removeEventListener('click', applyResponsiveStyles);
-    window.clearInterval(this.internalID);
-
     const isError =
       faceTecSessionStatus !== FaceTecSDK.FaceTecSessionStatus.SessionCompleted;
 
@@ -298,18 +298,6 @@ export class AzifaceController implements Controller {
     } else {
       throw new SessionError(MethodError.NotInitialized);
     }
-
-    window.addEventListener('click', applyResponsiveStyles);
-
-    const windowClickEvent = new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-    });
-
-    this.internalID = window.setInterval(() => {
-      window.dispatchEvent(windowClickEvent);
-    }, 250);
   };
 }
 
