@@ -5,27 +5,3 @@
 #DOM_FT_orientationImageContainer {
   margin: 0 auto !important;
 }
-
-#DOM_FT_mainInterfaceNonOverlayContainer {
-  @media (max-width: 768px) {
-    border: 2px solid white !important;
-  }
-}
-
-#DOM_FT_readyScreenHeaderElement {
-  @media (max-width: 768px) {
-    font-size: 1rem !important;
-  }
-}
-
-#DOM_FT_readyScreenSubtextElement {
-  @media (max-width: 768px) {
-    font-size: 0.75rem !important;
-  }
-}
-
-#DOM_FT_yourAppLogoContainer {
-  @media (max-width: 768px) {
-    height: calc(100% - 360px) !important;
-  }
-}
