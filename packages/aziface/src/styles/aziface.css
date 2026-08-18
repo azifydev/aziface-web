@@ -5,3 +5,9 @@
 #DOM_FT_orientationImageContainer {
   margin: 0 auto !important;
 }
+
+#DOM_FT_mainInterfaceNonOverlayContainer {
+  @media (max-width: 768px) {
+    border: 2px solid white !important;
+  }
+}
