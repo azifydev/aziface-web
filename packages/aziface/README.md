@@ -25,7 +25,7 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
   - [`resetTheme`](#resettheme)
   - [`setLocale`](#setlocale)
     - [`Properties`](#properties-3)
-- [Hooks]
+- [Hooks](#hooks)
   - [`useAziface`](#useaziface)
     - [`Properties`](#properties-4)
       - [`enroll`](#enroll)
@@ -153,31 +153,52 @@ Typical integration flow:
 5. Use `useAziface()` to access session methods: `enroll`, `authenticate`, `liveness`, `photoScan`, and `photoMatch`
 6. Call `dispose()` when the SDK is no longer needed
 
-Session methods throw [`SessionError`](#sessionerror) on failure — always wrap them in `try/catch`.
+Session methods resolve as soon as the session **starts**. They reject with [`SessionError`](#sessionerror) only when the session can't start (e.g. `NotInitialized`, `NoUserEnrolled`), so wrap them in `try/catch`. The session **result** (success or failure) is delivered through the reactive `data` and `error` values returned by [`useAziface`](#useaziface).
 
 <hr/>
 
 ## Usage
 
 ```tsx
-// ...
+import { useEffect, useState } from 'react';
 import {
   dispose,
   initialize,
   setLocale,
   useAziface,
-  withTheme,
   SessionError,
   type InitializeHeaders,
   type InitializeParams,
 } from '@azify/aziface-web';
 import '@azify/aziface-web/dist/aziface.css';
 
+type FaceScanType =
+  | 'enroll'
+  | 'authenticate'
+  | 'liveness'
+  | 'photoMatch'
+  | 'photoScan';
+
+const FACE_SCANS: { type: FaceScanType; label: string }[] = [
+  { type: 'enroll', label: 'Enroll' },
+  { type: 'liveness', label: 'Liveness' },
+  { type: 'authenticate', label: 'Authenticate' },
+  { type: 'photoMatch', label: 'Photo Match' },
+  { type: 'photoScan', label: 'Photo Scan' },
+];
+
 export function MyPage() {
-  // ...
   const [isInitialized, setIsInitialized] = useState(false);
   const { data, error, authenticate, enroll, liveness, photoMatch, photoScan } =
     useAziface();
+
+  const sessions: Record<FaceScanType, () => Promise<boolean>> = {
+    enroll,
+    authenticate,
+    liveness,
+    photoMatch,
+    photoScan,
+  };
 
   const onInitialize = (): void => {
     const params: InitializeParams = {
@@ -213,99 +234,40 @@ export function MyPage() {
     });
   };
 
-  const onFaceScan = async (type: string): Promise<void> => {
+  const onFaceScan = async (type: FaceScanType): Promise<void> => {
     try {
-      switch (type) {
-        case 'enroll':
-          await enroll();
-          break;
-        case 'authenticate':
-          await authenticate();
-          break;
-        case 'liveness':
-          await liveness();
-          break;
-        case 'photoMatch':
-          await photoMatch();
-          break;
-        case 'photoScan':
-          await photoScan();
-          break;
-        default:
-          console.error(`Invalid face scan type: ${type}`);
-          break;
-      }
+      await sessions[type]();
     } catch (error) {
-      const sessionError = error as SessionError;
-      console.error(sessionError.message);
+      // Only thrown when the session can't start (e.g. NotInitialized, NoUserEnrolled).
+      if (error instanceof SessionError) {
+        console.error(`${error.message} - (${error.code})`);
+      }
     }
   };
 
+  // Session results are delivered here. `SessionCompleted` is `0`, so compare with `undefined`.
   useEffect(() => {
-    if (data) console.log(data);
+    if (data !== undefined) console.log(`Session completed - (${data})`);
     if (error) console.error(error.message);
   }, [data, error]);
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50'>
-      <div className='bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm shadow-sm'>
-        <div className='flex flex-col gap-3'>
-          <button
-            onClick={onInitialize}
-            className='w-full py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Initialize
-          </button>
+    <div>
+      <button onClick={onInitialize}>Initialize</button>
 
-          <button
-            onClick={() => onFaceScan('enroll')}
-            disabled={!isInitialized}
-            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Enroll
-          </button>
+      {FACE_SCANS.map(({ type, label }) => (
+        <button
+          key={type}
+          onClick={() => onFaceScan(type)}
+          disabled={!isInitialized}
+        >
+          {label}
+        </button>
+      ))}
 
-          <button
-            onClick={() => onFaceScan('liveness')}
-            disabled={!isInitialized}
-            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Liveness
-          </button>
-
-          <button
-            onClick={() => onFaceScan('authenticate')}
-            disabled={!isInitialized}
-            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Authenticate
-          </button>
-
-          <button
-            onClick={() => onFaceScan('photoMatch')}
-            disabled={!isInitialized}
-            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Photo Match
-          </button>
-
-          <button
-            onClick={() => onFaceScan('photoScan')}
-            disabled={!isInitialized}
-            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Photo Scan
-          </button>
-
-          <button
-            onClick={onDispose}
-            disabled={!isInitialized}
-            className='w-full py-3 disabled:hover:bg-gray-100 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 transition active:scale-[0.98]'
-          >
-            Dispose
-          </button>
-        </div>
-      </div>
+      <button onClick={onDispose} disabled={!isInitialized}>
+        Dispose
+      </button>
     </div>
   );
 }
@@ -315,18 +277,18 @@ export function MyPage() {
 
 ## API
 
-| Methods        | Return type        |
-| -------------- | ------------------ |
-| `initialize`   | `void`             |
-| `dispose`      | `void`             |
-| `enroll`       | `Promise<boolean>` |
-| `authenticate` | `Promise<boolean>` |
-| `liveness`     | `Promise<boolean>` |
-| `photoScan`    | `Promise<boolean>` |
-| `photoMatch`   | `Promise<boolean>` |
-| `withTheme`    | `void`             |
-| `resetTheme`   | `void`             |
-| `setLocale`    | `void`             |
+| Methods        | Return type        | Access                        |
+| -------------- | ------------------ | ----------------------------- |
+| `initialize`   | `void`             | Package export                |
+| `dispose`      | `void`             | Package export                |
+| `enroll`       | `Promise<boolean>` | [`useAziface()`](#useaziface) |
+| `authenticate` | `Promise<boolean>` | [`useAziface()`](#useaziface) |
+| `liveness`     | `Promise<boolean>` | [`useAziface()`](#useaziface) |
+| `photoScan`    | `Promise<boolean>` | [`useAziface()`](#useaziface) |
+| `photoMatch`   | `Promise<boolean>` | [`useAziface()`](#useaziface) |
+| `withTheme`    | `void`             | Package export                |
+| `resetTheme`   | `void`             | Package export                |
+| `setLocale`    | `void`             | Package export                |
 
 ### `initialize`
 
@@ -408,7 +370,7 @@ initialize(
   initialized => {
     const error = initialized.error;
 
-    if (error && !initialized.isSuccess) {
+    if (error) {
       console.error(`${error.cause} - (${error.code})`);
     } else {
       withTheme({
@@ -441,7 +403,7 @@ initialize(
     // ...
   },
   initialized => {
-    if (initialized.error && !initialized.isSuccess) {
+    if (initialized.error) {
       // ...
     } else {
       withTheme({
@@ -459,6 +421,10 @@ initialize(
 
 The `resetTheme` method restores the default theme.
 
+```ts
+resetTheme();
+```
+
 ### `setLocale`
 
 The `setLocale` method in the Aziface SDK is used to define the language and locale used by the SDK’s user interface and vocal guidance during verification sessions. The Aziface SDK must be successfully initialized **before calling** this API.
@@ -475,7 +441,7 @@ initialize(
     // ...
   },
   initialized => {
-    if (initialized.error && !initialized.isSuccess) {
+    if (initialized.error) {
       // ...
     } else {
       setLocale('pt-BR');
@@ -505,7 +471,7 @@ const { data, error, enroll, authenticate, liveness, photoMatch, photoScan } =
 
 #### Properties
 
-| Property                        | Type                       |
+| Property                        | Return Type                |
 | ------------------------------- | -------------------------- |
 | `data`                          | `SessionCode \| undefined` |
 | `error`                         | `Error \| undefined`       |
@@ -514,6 +480,9 @@ const { data, error, enroll, authenticate, liveness, photoMatch, photoScan } =
 | [`liveness`](#liveness)         | `Promise<boolean>`         |
 | [`photoMatch`](#photomatch)     | `Promise<boolean>`         |
 | [`photoScan`](#photoscan)       | `Promise<boolean>`         |
+
+> [!NOTE]
+> `data` holds `SessionCompleted` (`0`) on success, which is falsy. Check it with `data !== undefined` instead of `if (data)`.
 
 ##### `enroll`
 
