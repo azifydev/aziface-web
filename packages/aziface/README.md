@@ -25,7 +25,7 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
   - [`resetTheme`](#resettheme)
   - [`setLocale`](#setlocale)
     - [`Properties`](#properties-3)
-- [Hooks]
+- [Hooks](#hooks)
   - [`useAziface`](#useaziface)
     - [`Properties`](#properties-4)
       - [`enroll`](#enroll)
@@ -34,6 +34,7 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
       - [`photoScan`](#photoscan)
       - [`photoMatch`](#photomatch)
 - [Styles](#styles)
+- [Responsiveness](#responsiveness)
 - [Types](#types)
   - [`Initialize`](#initialize-1)
     - [`InitializeParams`](#initializeparams)
@@ -568,6 +569,25 @@ Simply import them onto the screen where you are using Aziface methods.
 import { dispose, initialize, useAziface } from '@azify/aziface-web';
 import '@azify/aziface-web/dist/aziface.css'; // <-- Add this import
 ```
+
+<hr/>
+
+## Responsiveness
+
+**The Aziface Web SDK is responsive out of the box. You don't need to write any code to adapt the session layout to different screen sizes.**
+
+The SDK automatically adjusts the session interface (frame, oval, buttons, feedback bar, and texts) to the device's viewport and orientation, on both desktop and mobile browsers.
+
+> [!IMPORTANT]
+> Do **not** implement manual responsiveness logic, such as:
+>
+> - Functions that recalculate sizes based on `window.innerWidth` or `window.innerHeight`.
+> - `resize` or `orientationchange` listeners that call `withTheme` again.
+> - Custom CSS overriding the SDK container's dimensions.
+>
+> This approach was used in the past and proved to be unnecessary, the SDK already handles it. Manual adjustments may conflict with the SDK's internal layout and cause visual inconsistencies.
+
+To customize the appearance, use only [`withTheme`](#withtheme) and the [predefined styles](#styles). The layout adaptation will continue to be managed by the SDK.
 
 <hr/>
 
