@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/azifydev/aziface-web/compare/v1.6.0...v1.7.0) (2026-10-05)
+
+
+### Features
+
+* add OCR and vocal guidance ([#12](https://github.com/azifydev/aziface-web/issues/12)) ([ad099cc](https://github.com/azifydev/aziface-web/commit/ad099ccd89d840f9c87fdc07a23b9a605e021ef7))
+
 # [1.6.0](https://github.com/azifydev/aziface-web/compare/v1.5.0...v1.6.0) (2026-10-05)
 
 # [1.5.0](https://github.com/azifydev/aziface-web/compare/v1.4.0...v1.5.0) (2026-10-05)
