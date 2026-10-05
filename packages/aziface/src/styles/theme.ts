@@ -1,156 +1,166 @@
 import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
 import { Style } from '../types/aziface';
-import { resolveCancelLocation } from '../utils';
+import { resolveCancelLocation, resolveVocalGuidanceMode } from '../utils';
+import OCR from '../assets/ocr/FaceTec_OCR_Customization.json';
 
 declare const FaceTecSDK: typeof FaceTecSDKType;
 
-function retrieveConfigurationWizardCustomization(theme?: Style) {
-  // For Color Customization
-  const outerBackgroundColor = theme?.backgroundColor || '#FFFFFF';
-  const frameColor = theme?.frameColor || outerBackgroundColor;
-  const borderColor = theme?.borderColor || '#026FF4';
-  const ovalColor = theme?.ovalColor || '#026FF4';
-  const dualSpinnerColor = theme?.dualSpinnerColor || '#026FF4';
-  const textColor = theme?.textColor || '#026FF4';
-  const buttonAndFeedbackBarColor =
-    theme?.buttonAndFeedbackBarColor || '#026FF4';
-  const buttonAndFeedbackBarTextColor =
-    theme?.buttonAndFeedbackBarTextColor || '#FFFFFF';
-  const buttonColorHighlight = theme?.buttonColorHighlight || '#0264DC';
-  const buttonColorDisabled = theme?.buttonColorDisabled || '#B3D4FC';
+export class ThemeController {
+  constructor() {
+    FaceTecSDK.configureOCRLocalization(OCR);
+  }
 
-  // For Frame Corner Radius Customization
-  const frameCornerRadius = theme?.frameCornerRadius || '20px';
+  public configure(theme?: Style) {
+    // For Color Customization
+    const outerBackgroundColor = theme?.backgroundColor || '#FFFFFF';
+    const frameColor = theme?.frameColor || outerBackgroundColor;
+    const borderColor = theme?.borderColor || '#026FF4';
+    const ovalColor = theme?.ovalColor || '#026FF4';
+    const dualSpinnerColor = theme?.dualSpinnerColor || '#026FF4';
+    const textColor = theme?.textColor || '#026FF4';
+    const buttonAndFeedbackBarColor =
+      theme?.buttonAndFeedbackBarColor || '#026FF4';
+    const buttonAndFeedbackBarTextColor =
+      theme?.buttonAndFeedbackBarTextColor || '#FFFFFF';
+    const buttonColorHighlight = theme?.buttonColorHighlight || '#0264DC';
+    const buttonColorDisabled = theme?.buttonColorDisabled || '#B3D4FC';
 
-  const commonDirectory = `/core/images/`;
-  // For Cancel Button Customization
-  const cancelButtonImage = `${commonDirectory}${theme?.cancelImage || 'FaceTec_cancel.png'}`;
-  // For Image Customization
-  const yourAppLogoImage = `${commonDirectory}${theme?.brandingImage || 'FaceTec_your_app_logo.png'}`;
-  const securityWatermarkImage =
-    FaceTecSDK.FaceTecSecurityWatermarkImage.FaceTec;
+    // For Frame Corner Radius Customization
+    const frameCornerRadius = theme?.frameCornerRadius || '20px';
 
-  // Set a Default Customization
-  const defaultCustomization = new FaceTecSDK.FaceTecCustomization();
+    const commonDirectory = `/core/images/`;
+    // For Cancel Button Customization
+    const cancelButtonImage = `${commonDirectory}${theme?.cancelImage || 'FaceTec_cancel.png'}`;
+    // For Image Customization
+    const yourAppLogoImage = `${commonDirectory}${theme?.brandingImage || 'FaceTec_your_app_logo.png'}`;
+    const securityWatermarkImage =
+      FaceTecSDK.FaceTecSecurityWatermarkImage.FaceTec;
 
-  // Set Frame Customization
-  defaultCustomization.frameCustomization.borderCornerRadius =
-    frameCornerRadius;
-  defaultCustomization.frameCustomization.backgroundColor =
-    outerBackgroundColor;
-  defaultCustomization.frameCustomization.borderColor = outerBackgroundColor;
+    // For Vocal Guidance Mode Customization
+    const vocalGuidanceMode = resolveVocalGuidanceMode(
+      theme?.vocalGuidance || 'OFF',
+    );
 
-  // Set Overlay Customization
-  defaultCustomization.overlayCustomization.brandingImage = yourAppLogoImage;
-  defaultCustomization.overlayCustomization.showBrandingImage =
-    typeof theme?.showBranding === 'boolean' ? theme.showBranding : true;
-  defaultCustomization.overlayCustomization.backgroundColor =
-    outerBackgroundColor;
+    // Set a Default Customization
+    const defaultCustomization = new FaceTecSDK.FaceTecCustomization();
 
-  // Set Guidance Customization
-  defaultCustomization.guidanceCustomization.backgroundColors = frameColor;
-  defaultCustomization.guidanceCustomization.foregroundColor = textColor;
-  defaultCustomization.guidanceCustomization.buttonBackgroundNormalColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.guidanceCustomization.buttonBackgroundDisabledColor =
-    buttonColorDisabled;
-  defaultCustomization.guidanceCustomization.buttonBackgroundHighlightColor =
-    buttonColorHighlight;
-  defaultCustomization.guidanceCustomization.buttonTextNormalColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.guidanceCustomization.buttonTextDisabledColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.guidanceCustomization.buttonTextHighlightColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.guidanceCustomization.retryScreenImageBorderColor =
-    borderColor;
-  defaultCustomization.guidanceCustomization.retryScreenOvalStrokeColor =
-    borderColor;
+    // Set Frame Customization
+    defaultCustomization.frameCustomization.borderCornerRadius =
+      frameCornerRadius;
+    defaultCustomization.frameCustomization.backgroundColor =
+      outerBackgroundColor;
+    defaultCustomization.frameCustomization.borderColor = outerBackgroundColor;
 
-  // Set Oval Customization
-  defaultCustomization.ovalCustomization.strokeColor = ovalColor;
-  defaultCustomization.ovalCustomization.progressColor1 = dualSpinnerColor;
-  defaultCustomization.ovalCustomization.progressColor2 = dualSpinnerColor;
+    // Set Overlay Customization
+    defaultCustomization.overlayCustomization.brandingImage = yourAppLogoImage;
+    defaultCustomization.overlayCustomization.showBrandingImage =
+      typeof theme?.showBranding === 'boolean' ? theme.showBranding : true;
+    defaultCustomization.overlayCustomization.backgroundColor =
+      outerBackgroundColor;
 
-  // Set Feedback Customization
-  defaultCustomization.feedbackCustomization.backgroundColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.feedbackCustomization.textColor =
-    buttonAndFeedbackBarTextColor;
+    // Set Guidance Customization
+    defaultCustomization.guidanceCustomization.backgroundColors = frameColor;
+    defaultCustomization.guidanceCustomization.foregroundColor = textColor;
+    defaultCustomization.guidanceCustomization.buttonBackgroundNormalColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.guidanceCustomization.buttonBackgroundDisabledColor =
+      buttonColorDisabled;
+    defaultCustomization.guidanceCustomization.buttonBackgroundHighlightColor =
+      buttonColorHighlight;
+    defaultCustomization.guidanceCustomization.buttonTextNormalColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.guidanceCustomization.buttonTextDisabledColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.guidanceCustomization.buttonTextHighlightColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.guidanceCustomization.retryScreenImageBorderColor =
+      borderColor;
+    defaultCustomization.guidanceCustomization.retryScreenOvalStrokeColor =
+      borderColor;
 
-  // Set Cancel Customization
-  defaultCustomization.cancelButtonCustomization.customImage =
-    cancelButtonImage;
-  defaultCustomization.cancelButtonCustomization.location =
-    resolveCancelLocation(theme?.cancelLocation);
+    // Set Oval Customization
+    defaultCustomization.ovalCustomization.strokeColor = ovalColor;
+    defaultCustomization.ovalCustomization.progressColor1 = dualSpinnerColor;
+    defaultCustomization.ovalCustomization.progressColor2 = dualSpinnerColor;
 
-  // Set Security Watermark Customization
-  defaultCustomization.securityWatermarkCustomization.setSecurityWatermarkImage(
-    securityWatermarkImage,
-  );
+    // Set Feedback Customization
+    defaultCustomization.feedbackCustomization.backgroundColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.feedbackCustomization.textColor =
+      buttonAndFeedbackBarTextColor;
 
-  // Set Result Screen Customization
-  defaultCustomization.resultScreenCustomization.backgroundColors = frameColor;
-  defaultCustomization.resultScreenCustomization.foregroundColor = textColor;
-  defaultCustomization.resultScreenCustomization.activityIndicatorColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.resultScreenCustomization.resultAnimationBackgroundColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.resultScreenCustomization.resultAnimationForegroundColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.resultScreenCustomization.uploadProgressFillColor =
-    buttonAndFeedbackBarColor;
+    // Set Cancel Customization
+    defaultCustomization.cancelButtonCustomization.customImage =
+      cancelButtonImage;
+    defaultCustomization.cancelButtonCustomization.location =
+      resolveCancelLocation(theme?.cancelLocation);
 
-  // Set ID Scan Customization
-  defaultCustomization.idScanCustomization.selectionScreenBackgroundColors =
-    frameColor;
-  defaultCustomization.idScanCustomization.selectionScreenForegroundColor =
-    textColor;
-  defaultCustomization.idScanCustomization.reviewScreenBackgroundColors =
-    frameColor;
-  defaultCustomization.idScanCustomization.reviewScreenForegroundColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.idScanCustomization.reviewScreenTextBackgroundColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.idScanCustomization.captureScreenForegroundColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.idScanCustomization.captureScreenTextBackgroundColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.idScanCustomization.buttonBackgroundNormalColor =
-    buttonAndFeedbackBarColor;
-  defaultCustomization.idScanCustomization.buttonBackgroundDisabledColor =
-    buttonColorDisabled;
-  defaultCustomization.idScanCustomization.buttonBackgroundHighlightColor =
-    buttonColorHighlight;
-  defaultCustomization.idScanCustomization.buttonTextNormalColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.idScanCustomization.buttonTextDisabledColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.idScanCustomization.buttonTextHighlightColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.idScanCustomization.captureScreenBackgroundColor =
-    frameColor;
-  defaultCustomization.idScanCustomization.captureFrameStrokeColor =
-    borderColor;
+    // Set Security Watermark Customization
+    defaultCustomization.securityWatermarkCustomization.setSecurityWatermarkImage(
+      securityWatermarkImage,
+    );
 
-  // Set Initial Loading Customization
-  defaultCustomization.initialLoadingAnimationCustomization.backgroundColor =
-    buttonAndFeedbackBarTextColor;
-  defaultCustomization.initialLoadingAnimationCustomization.foregroundColor =
-    buttonAndFeedbackBarColor;
+    // Set Result Screen Customization
+    defaultCustomization.resultScreenCustomization.backgroundColors =
+      frameColor;
+    defaultCustomization.resultScreenCustomization.foregroundColor = textColor;
+    defaultCustomization.resultScreenCustomization.activityIndicatorColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.resultScreenCustomization.resultAnimationBackgroundColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.resultScreenCustomization.resultAnimationForegroundColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.resultScreenCustomization.uploadProgressFillColor =
+      buttonAndFeedbackBarColor;
 
-  return defaultCustomization;
-}
+    // Set ID Scan Customization
+    defaultCustomization.idScanCustomization.selectionScreenBackgroundColors =
+      frameColor;
+    defaultCustomization.idScanCustomization.selectionScreenForegroundColor =
+      textColor;
+    defaultCustomization.idScanCustomization.reviewScreenBackgroundColors =
+      frameColor;
+    defaultCustomization.idScanCustomization.reviewScreenForegroundColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.idScanCustomization.reviewScreenTextBackgroundColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.idScanCustomization.captureScreenForegroundColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.idScanCustomization.captureScreenTextBackgroundColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.idScanCustomization.buttonBackgroundNormalColor =
+      buttonAndFeedbackBarColor;
+    defaultCustomization.idScanCustomization.buttonBackgroundDisabledColor =
+      buttonColorDisabled;
+    defaultCustomization.idScanCustomization.buttonBackgroundHighlightColor =
+      buttonColorHighlight;
+    defaultCustomization.idScanCustomization.buttonTextNormalColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.idScanCustomization.buttonTextDisabledColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.idScanCustomization.buttonTextHighlightColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.idScanCustomization.captureScreenBackgroundColor =
+      frameColor;
+    defaultCustomization.idScanCustomization.captureFrameStrokeColor =
+      borderColor;
 
-export function applyTheme(theme?: Style): void {
-  const currentCustomization = retrieveConfigurationWizardCustomization(theme);
+    // Set Initial Loading Customization
+    defaultCustomization.initialLoadingAnimationCustomization.backgroundColor =
+      buttonAndFeedbackBarTextColor;
+    defaultCustomization.initialLoadingAnimationCustomization.foregroundColor =
+      buttonAndFeedbackBarColor;
 
-  FaceTecSDK.setCustomization(currentCustomization);
-  FaceTecSDK.setLowLightCustomization(currentCustomization);
-  FaceTecSDK.setDynamicDimmingCustomization(currentCustomization);
-}
+    // Set Vocal Guidance Customization (0 - MINIMAL, 1 - FULL, 2 - OFF)
+    defaultCustomization.vocalGuidanceCustomization.mode = vocalGuidanceMode;
 
-export function getBackgroundColor(): string {
-  const customization = new FaceTecSDK.FaceTecCustomization();
-  return customization.overlayCustomization.backgroundColor || '#FFFFFF';
+    FaceTecSDK.setCustomization(defaultCustomization);
+    FaceTecSDK.setLowLightCustomization(defaultCustomization);
+    FaceTecSDK.setDynamicDimmingCustomization(defaultCustomization);
+  }
+
+  public getBackgroundColor(): string {
+    const customization = new FaceTecSDK.FaceTecCustomization();
+    return customization.overlayCustomization.backgroundColor || '#FFFFFF';
+  }
 }

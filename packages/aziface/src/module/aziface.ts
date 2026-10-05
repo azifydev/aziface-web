@@ -6,7 +6,7 @@ import {
 import { FaceTecSDK as FaceTecSDKType } from '../types/FaceTecSDK';
 import { SessionError } from '../errors/errors';
 import { SessionRequestProcessor } from '../services/request-processor';
-import { applyTheme, getBackgroundColor } from '../styles/theme';
+import { ThemeController } from '../styles/theme';
 import { getInitializationErrorCauseByCode } from '../utils';
 import {
   Controller,
@@ -40,6 +40,11 @@ export class AzifaceController implements Controller {
   public static baseUrl: string = '';
   public static headers: InitializeHeaders = {} as InitializeHeaders;
   private faceTecSDKInstance: FaceTecSDKInstance | null = null;
+  private theme: ThemeController;
+
+  constructor() {
+    this.theme = new ThemeController();
+  }
 
   public static subscribe(listener: VoidFunction): VoidFunction {
     AzifaceController.listeners.add(listener);
@@ -62,7 +67,7 @@ export class AzifaceController implements Controller {
     FaceTecSDK.setImagesDirectory(`/core/images`);
     FaceTecSDK.setResourceDirectory(`/core/facetec/resources`);
 
-    applyTheme();
+    this.theme.configure();
 
     if (AzifaceController.isInitialized) {
       callback({
@@ -169,7 +174,8 @@ export class AzifaceController implements Controller {
     });
   };
 
-  public withTheme = (overrides?: Style): void => applyTheme(overrides);
+  public withTheme = (overrides?: Style): void =>
+    this.theme.configure(overrides);
 
   public setLocale = (locale: Locale): void =>
     this.decoratorSync(() => FaceTecSDK.configureLocalization(i18n[locale]));
@@ -290,7 +296,7 @@ export class AzifaceController implements Controller {
     );
 
     if (container) {
-      container.style.backgroundColor = getBackgroundColor();
+      container.style.backgroundColor = this.theme.getBackgroundColor();
     } else {
       throw new SessionError(MethodError.NotInitialized);
     }

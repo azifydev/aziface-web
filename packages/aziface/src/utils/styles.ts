@@ -1,4 +1,4 @@
-import { CancelLocation } from '../types/aziface';
+import { CancelLocation, VocalGuidanceMode } from '../types/aziface';
 import type { FaceTecCancelButtonLocation } from '../types/FaceTecCustomization';
 
 const CANCEL_BUTTON_LOCATION = {
@@ -18,4 +18,15 @@ export function resolveCancelLocation(
   };
 
   return location ? locations[location] : defaultLocation;
+}
+
+export function resolveVocalGuidanceMode(mode?: VocalGuidanceMode): number {
+  const modes: Record<VocalGuidanceMode, number> = {
+    MINIMAL: 0,
+    FULL: 1,
+    OFF: 2,
+  };
+
+  // Return OFF (2) if mode is not specified
+  return mode ? modes[mode] : 2;
 }
