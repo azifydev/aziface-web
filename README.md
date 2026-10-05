@@ -38,26 +38,6 @@ npm ci
 | `npm run vite:build` | Build Vite demo only                            |
 | `npm run clean`      | Remove build artifacts                          |
 
-### SDK package only
-
-```bash
-npm run build -w @azify/aziface-web
-npm run dev -w @azify/aziface-web   # watch mode (tsup)
-```
-
-When developing the SDK alongside a demo app, link the local package or bump the workspace dependency in the app `package.json`.
-
-## Repository structure
-
-```
-aziface-web/
-├── packages/aziface/     # @azify/aziface-web (npm package)
-├── apps/nextapp/         # Next.js reference implementation
-├── apps/viteapp/         # Vite reference implementation
-├── .github/workflows/    # CI and release pipelines
-└── .releaserc.js         # semantic-release configuration
-```
-
 ## Contributing
 
 ### Pull requests
@@ -94,21 +74,9 @@ Releases are automated with [semantic-release](https://semantic-release.gitbook.
 4. Create GitHub release and tag (`vX.Y.Z`)
 5. Commit `package.json` + `CHANGELOG.md` with `[skip ci]`
 
-**Manual release (maintainers):**
+## Documentation
 
-```bash
-npm run release
-```
-
-Requires `GH_TOKEN` and `NPM_TOKEN` with publish access to the `@azify` scope.
-
-### GitHub Actions secrets
-
-| Secret               | Purpose                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------ |
-| `GH_TOKEN_V2`        | Push release commits, create GitHub releases                                               |
-| `NPM_TOKEN_V2`       | Publish `@azify/aziface-web` to npm (Automation token with **Read and Write** on `@azify`) |
-| `AZIFACE_ASSETS_URL` | FaceTec assets (CI/internal use)                                                           |
+- [Aziface package](./packages/aziface/README.md)
 
 ## License
 

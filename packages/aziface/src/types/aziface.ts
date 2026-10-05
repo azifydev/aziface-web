@@ -1,7 +1,4 @@
-import {
-  FaceTecInitializationError,
-  FaceTecSessionStatus,
-} from '../types/FaceTecPublicApi';
+import { FaceTecInitializationError, FaceTecSessionStatus } from '../types/FaceTecPublicApi';
 
 /**
  * @enum MethodError
@@ -15,11 +12,6 @@ export enum MethodError {
    * Please call the `initialize()` method before attempting to call this method.
    */
   NotInitialized = 9,
-
-  /**
-   * No user enrolled. Please enroll a user before attempting to authenticate.
-   */
-  NoUserEnrolled = 10,
 }
 
 /**
@@ -181,14 +173,16 @@ export interface InitializeResponse {
  */
 export interface Style {
   /**
-   * @description The background color of the Aziface UI.
+   * @description The background color of the Aziface UI, including the overlay
+   * and the frame.
    *
    * @default '#FFFFFF'
    */
   backgroundColor?: string;
 
   /**
-   * @description The color of the frame around the Aziface UI.
+   * @description The background color of the guidance, result, and ID scan
+   * screens. Falls back to `backgroundColor`.
    *
    * @default '#FFFFFF'
    */
@@ -329,21 +323,7 @@ export interface DisposeCallback {
  * Aziface SDK. This type includes a list of language codes that can be used to
  * set the locale of the SDK.
  */
-export type Locale =
-  | 'af'
-  | 'ar'
-  | 'de'
-  | 'el'
-  | 'en'
-  | 'es'
-  | 'fr'
-  | 'ja'
-  | 'kk'
-  | 'no'
-  | 'pt-BR'
-  | 'ru'
-  | 'vi'
-  | 'zh';
+export type Locale = 'af' | 'ar' | 'de' | 'el' | 'en' | 'es' | 'fr' | 'ja' | 'kk' | 'no' | 'pt-BR' | 'ru' | 'vi' | 'zh';
 
 export interface SnapshotProps {
   data?: SessionCode;

@@ -656,7 +656,6 @@ The session code is a type identifier of the session when a method fails or it h
 | `UnknownInternalError`              | An unknown and unexpected error occurred.                                                                                                                    | `7`        |
 | `IFrameNotAllowedWithoutPermission` | The session was cancelled because the Aziface SDK was opened in an iframe without permission.                                                                | `8`        |
 | `NotInitialized`                    | This error code indicates that the Aziface SDK has not been initialized.                                                                                     | `9`        |
-| `NoUserEnrolled`                    | No user enrolled. Please enroll a user before attempting to authenticate.                                                                                    | `10`       |
 
 ### `DisposeCallback`
 
