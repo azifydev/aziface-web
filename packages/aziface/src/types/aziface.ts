@@ -1,4 +1,7 @@
-import { FaceTecInitializationError, FaceTecSessionStatus } from '../types/FaceTecPublicApi';
+import {
+  FaceTecInitializationError,
+  FaceTecSessionStatus,
+} from '../types/FaceTecPublicApi';
 
 /**
  * @enum MethodError
@@ -166,6 +169,14 @@ export interface InitializeResponse {
 }
 
 /**
+ * @type {VocalGuidanceMode}
+ *
+ * @description Enum representing different vocal guidance modes for the user
+ * interface.
+ */
+export type VocalGuidanceMode = 'MINIMAL' | 'FULL' | 'OFF';
+
+/**
  * @interface Style
  *
  * @description An object that defines the customizable styling options for the
@@ -286,6 +297,13 @@ export interface Style {
    * @default true
    */
   showBranding?: boolean;
+
+  /**
+   * @description The vocal guidance mode for the Aziface UI.
+   *
+   * @default 'OFF'
+   */
+  vocalGuidance?: VocalGuidanceMode;
 }
 
 /**
@@ -323,7 +341,21 @@ export interface DisposeCallback {
  * Aziface SDK. This type includes a list of language codes that can be used to
  * set the locale of the SDK.
  */
-export type Locale = 'af' | 'ar' | 'de' | 'el' | 'en' | 'es' | 'fr' | 'ja' | 'kk' | 'no' | 'pt-BR' | 'ru' | 'vi' | 'zh';
+export type Locale =
+  | 'af'
+  | 'ar'
+  | 'de'
+  | 'el'
+  | 'en'
+  | 'es'
+  | 'fr'
+  | 'ja'
+  | 'kk'
+  | 'no'
+  | 'pt-BR'
+  | 'ru'
+  | 'vi'
+  | 'zh';
 
 export interface SnapshotProps {
   data?: SessionCode;

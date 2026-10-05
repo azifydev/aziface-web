@@ -47,6 +47,7 @@ Web SDK adapter for React — face enrollment, authentication, liveness, and doc
   - [`SessionCode`](#sessioncode)
   - [`Style`](#style)
     - [`CancelLocation`](#cancellocation)
+    - [`VocalGuidanceMode`](#vocalguidancemode)
   - [`Locale`](#locale)
 - [Classes](#classes)
   - [`SessionError`](#sessionerror)
@@ -658,23 +659,24 @@ Use `DisposeCallback` to receive the dispose response.
 
 Customize your Aziface SDK using `Style` object.
 
-| Property                        | Type                                | Required | Default     |
-| ------------------------------- | ----------------------------------- | -------- | ----------- |
-| `backgroundColor`               | `string`                            | ❌       | `#FFFFFF`   |
-| `frameColor`                    | `string`                            | ❌       | `#FFFFFF`   |
-| `borderColor`                   | `string`                            | ❌       | `#026FF4`   |
-| `ovalColor`                     | `string`                            | ❌       | `#026FF4`   |
-| `dualSpinnerColor`              | `string`                            | ❌       | `#026FF4`   |
-| `textColor`                     | `string`                            | ❌       | `#026FF4`   |
-| `buttonAndFeedbackBarColor`     | `string`                            | ❌       | `#026FF4`   |
-| `buttonAndFeedbackBarTextColor` | `string`                            | ❌       | `#FFFFFF`   |
-| `buttonColorHighlight`          | `string`                            | ❌       | `#0264DC`   |
-| `buttonColorDisabled`           | `string`                            | ❌       | `#B3D4FC`   |
-| `frameCornerRadius`             | `string`                            | ❌       | `20px`      |
-| `cancelImage`                   | `string`                            | ❌       | `undefined` |
-| `cancelLocation`                | [`CancelLocation`](#cancellocation) | ❌       | `top-left`  |
-| `brandingImage`                 | `string`                            | ❌       | `undefined` |
-| `showBranding`                  | `boolean`                           | ❌       | `true`      |
+| Property                        | Type                                      | Required | Default     |
+| ------------------------------- | ----------------------------------------- | -------- | ----------- |
+| `backgroundColor`               | `string`                                  | ❌       | `#FFFFFF`   |
+| `frameColor`                    | `string`                                  | ❌       | `#FFFFFF`   |
+| `borderColor`                   | `string`                                  | ❌       | `#026FF4`   |
+| `ovalColor`                     | `string`                                  | ❌       | `#026FF4`   |
+| `dualSpinnerColor`              | `string`                                  | ❌       | `#026FF4`   |
+| `textColor`                     | `string`                                  | ❌       | `#026FF4`   |
+| `buttonAndFeedbackBarColor`     | `string`                                  | ❌       | `#026FF4`   |
+| `buttonAndFeedbackBarTextColor` | `string`                                  | ❌       | `#FFFFFF`   |
+| `buttonColorHighlight`          | `string`                                  | ❌       | `#0264DC`   |
+| `buttonColorDisabled`           | `string`                                  | ❌       | `#B3D4FC`   |
+| `frameCornerRadius`             | `string`                                  | ❌       | `20px`      |
+| `cancelImage`                   | `string`                                  | ❌       | `undefined` |
+| `cancelLocation`                | [`CancelLocation`](#cancellocation)       | ❌       | `top-left`  |
+| `brandingImage`                 | `string`                                  | ❌       | `undefined` |
+| `showBranding`                  | `boolean`                                 | ❌       | `true`      |
+| `vocalGuidance`                 | [`VocalGuidanceMode`](#vocalguidancemode) | ❌       | `OFF`       |
 
 #### `CancelLocation`
 
@@ -685,6 +687,16 @@ The `CancelLocation` type defines where the cancel button will be shown.
 | `top-left`  | Displays cancel button in top-left.  |
 | `top-right` | Displays cancel button in top-right. |
 | `none`      | Hides the cancel button.             |
+
+#### `VocalGuidanceMode`
+
+The `VocalGuidanceMode` type defines vocal guidance mode.
+
+| type      | Description                      |
+| --------- | -------------------------------- |
+| `MINIMAL` | Displays minimal vocal guidance. |
+| `FULL`    | Displays full vocal guidance.    |
+| `OFF`     | Disable vocal guidance.          |
 
 ### Locale
 
