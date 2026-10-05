@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/azifydev/aziface-web/compare/v1.4.0...v1.5.0) (2026-10-05)
+
+
+### Bug Fixes
+
+* controller ([#11](https://github.com/azifydev/aziface-web/issues/11)) ([7de0527](https://github.com/azifydev/aziface-web/commit/7de05276180c6b3c1631906ca6938e17ee5c3cf9))
+
 # [1.4.0](https://github.com/azifydev/aziface-web/compare/v1.3.0...v1.4.0) (2026-08-18)
 
 
