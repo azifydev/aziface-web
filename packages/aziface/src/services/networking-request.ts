@@ -30,7 +30,7 @@ export class FaceTecTestingAPINetworkingRequest {
   public send = (
     faceTecTestingAPIPayload: {
       requestBlob: string;
-      externalDatabaseRefID: string;
+      externalDatabaseRefID?: string;
     },
     requestCallback: FaceTecSessionRequestProcessorCallback,
   ): void => {

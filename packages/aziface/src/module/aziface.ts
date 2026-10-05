@@ -120,13 +120,9 @@ export class AzifaceController implements Controller {
 
   public authenticate = async (): Promise<boolean> => {
     return await this.decoratorAsync(instance => {
-      if (AzifaceController.latestExternalDatabaseRefID.length === 0) {
-        throw new SessionError(MethodError.NoUserEnrolled);
-      } else {
-        const processor = this.makeSessionRequestProcessor();
-        instance.start3DLivenessThen3DFaceMatch(processor);
-        this.onAttach();
-      }
+      const processor = this.makeSessionRequestProcessor();
+      instance.start3DLivenessThen3DFaceMatch(processor);
+      this.onAttach();
     });
   };
 

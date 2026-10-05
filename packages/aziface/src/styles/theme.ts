@@ -7,7 +7,7 @@ declare const FaceTecSDK: typeof FaceTecSDKType;
 function retrieveConfigurationWizardCustomization(theme?: Style) {
   // For Color Customization
   const outerBackgroundColor = theme?.backgroundColor || '#FFFFFF';
-  const frameColor = theme?.frameColor || '#FFFFFF';
+  const frameColor = theme?.frameColor || outerBackgroundColor;
   const borderColor = theme?.borderColor || '#026FF4';
   const ovalColor = theme?.ovalColor || '#026FF4';
   const dualSpinnerColor = theme?.dualSpinnerColor || '#026FF4';
@@ -36,8 +36,9 @@ function retrieveConfigurationWizardCustomization(theme?: Style) {
   // Set Frame Customization
   defaultCustomization.frameCustomization.borderCornerRadius =
     frameCornerRadius;
-  defaultCustomization.frameCustomization.backgroundColor = frameColor;
-  defaultCustomization.frameCustomization.borderColor = borderColor;
+  defaultCustomization.frameCustomization.backgroundColor =
+    outerBackgroundColor;
+  defaultCustomization.frameCustomization.borderColor = outerBackgroundColor;
 
   // Set Overlay Customization
   defaultCustomization.overlayCustomization.brandingImage = yourAppLogoImage;

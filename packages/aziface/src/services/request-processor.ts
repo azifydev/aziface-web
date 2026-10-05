@@ -42,11 +42,15 @@ export class SessionRequestProcessor {
     // Create the simple payload to send to the networking class
     const sessionRequestProcessorPayload: {
       requestBlob: string;
-      externalDatabaseRefID: string;
+      externalDatabaseRefID?: string;
     } = {
       requestBlob: requestBlob,
-      externalDatabaseRefID: this.demonstrationExternalDatabaseRefID,
     };
+
+    if (this.demonstrationExternalDatabaseRefID.length > 0) {
+      sessionRequestProcessorPayload.externalDatabaseRefID =
+        this.demonstrationExternalDatabaseRefID;
+    }
 
     // Here you will call your implementation of networking that communicates through your middleware that contacts your server code
     // Send the payload to the FaceTecTestingAPI for processing
